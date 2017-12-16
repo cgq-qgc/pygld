@@ -31,24 +31,44 @@ from pygld import HeatCarrierFluid
 # Test RawDataDownloader
 # -------------------------------
 
-def test_water():
+def test_antifreeze():
     hcfluid = HeatCarrierFluid('water', 28)
-    expected_results = [
-            [-10, 998.13, 4272, nan, 0.0026477]]
+    hcfluid.fr = 0.3
+    with pytest.raises(ValueError):
+        hcfluid.fr = -1
+    with pytest.raises(ValueError):
+        hcfluid.fr = 2
+    assert hcfluid.fr == 0
 
-    for er in expected_results:
-        hcfluid.Tref = er[0]
-        # Assert primary properties.
-        assert np.round(hcfluid.rho, 2) == er[1]
-        assert np.round(hcfluid.cp, 3) == er[2]
-        if np.isnan(er[3]):
-            assert np.isnan(hcfluid.k)
-        else:
-            assert np.round(hcfluid.k, 4) == er[3]
-        assert hcfluid.mu == er[4]
+    hcfluid.fluid = 'prop_glycol'
+    assert hcfluid.fr == 0.3
 
-        # Assert derived properties.
-        assert np.round(hcfluid.Cp, 2) == 4264011.36
+
+def test_water():
+    """ Test water properties."""
+    hcfluid = HeatCarrierFluid('water', 28)
+    expected_results = [[-10, 998.13, 4272, nan, 0.0026477, 4264011.36,
+                         nan, 2.6526604750884153e-06, nan],
+                        [10, 999.70, 4195, 0.5820, 0.0013059, 4193741.5,
+                         9.412801546391753, 1.30629188756627e-06,
+                         1.3877822464737036e-07]]
+
+    for expected_result in expected_results:
+        hcfluid.Tref = expected_result[0]
+
+        # Assert freezing and boiling point temperature.
+        assert hcfluid.Tfp == 0
+        assert hcfluid.Tbp == 100
+
+        # Assert primay and derived properties.
+        result = [hcfluid.Tref, hcfluid.rho, hcfluid.cp, hcfluid.k,
+                  hcfluid.mu, hcfluid.Cp, hcfluid.Pr, hcfluid.nu,
+                  hcfluid.al]
+        for val, exp_val in zip(result, expected_result):
+            if np.isnan(exp_val):
+                assert np.isnan(val)
+            else:
+                assert abs(val - exp_val)/exp_val*100 < 0.01
 
 
 if __name__ == "__main__":
