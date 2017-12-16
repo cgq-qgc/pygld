@@ -1,7 +1,6 @@
 # PyGLD - Python Ground Loop Designer
 
-Copyright 2016-2017 © Louis Lamarche<br>
-Copyright 2016-2017 © Jean-Sébastien Gosselin<br>
+Copyright 2016-2017 © PyGLD Project Contributors<br>
 Licensed under the terms of the MIT License
 
 # Project details and build status
