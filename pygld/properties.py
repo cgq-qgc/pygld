@@ -51,7 +51,7 @@ class HeatCarrierFluid(object):
 
     References:
     -----------
-    Properties for pure water were taken from :
+    Properties for pure water were taken from p.154 of:
 
     VDI-Gesellschaft, 2010. VDI Heat Atlas. VDI-Verlag GmbH, Dusseldorf,
         Germany, Berlin; London.
@@ -215,12 +215,12 @@ class HeatCarrierFluid(object):
     # =========================================================================
 
     def interp(self, x, z, y=None):
-
-        # interpolate value from table for aqueous solutions and pure water
-        # x is temperature
-        # y is the antifreeze volumetric fraction
-        # z is thermodynamic variable
-
+        """
+        Interpolate a value from table for aqueous solutions and pure water
+        x is temperature
+        y is the antifreeze volumetric fraction
+        z is thermodynamic variable
+        """
         if self.fluid == 'water':
             x1 = self.Tref
             z1 = interpolate.griddata(x, z, x1, method='cubic')
@@ -230,7 +230,6 @@ class HeatCarrierFluid(object):
                 y1 = self.fr
             else:
                 y1 = np.ones(np.size(x1)) * self.fr
-
             z1 = interpolate.griddata((x, y), z, (x1, y1), method='cubic')
 
         return z1
@@ -238,4 +237,3 @@ class HeatCarrierFluid(object):
 
 if __name__ == '__main__':
     pass
-
