@@ -28,22 +28,10 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from pygld import HeatCarrierFluid
 
 
-# Qt Test Fixtures
-# --------------------------------
-
-@pytest.fixture
-def hcf_bot(qtbot):
-    hcf = HeatCarrierFluid()
-    return hcf, qtbot
-
-
 # Test RawDataDownloader
 # -------------------------------
 
-def test_water(hcf_bot):
-    hcf, qtbot = hcf_bot
-    assert hcf
-
+def test_water():
     hcfluid = HeatCarrierFluid('water', 28)
     expected_results = [
             [-10, 998.13, 4272, nan, 0.0026477]]
