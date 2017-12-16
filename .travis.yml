@@ -1,0 +1,24 @@
+# https://travis-ci.org/jnsebgosselin/pygld
+
+language: python
+python: "3.6"
+
+install:
+  - sudo apt-get update
+  - pip install xlsxwriter
+  - pip install xlrd
+  - pip install pytest
+  - pip install pytest-qt
+  - pip install pytest-xvfb
+  - pip install pytest-mock
+  - pip install pytest-cov
+  - pip install pytest-ordering
+  - pip install coveralls
+  - pip install matplotlib
+  - pip install scipy
+
+script:
+  python runtests.py
+
+after_success:
+  - coveralls
