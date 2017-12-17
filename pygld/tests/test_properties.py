@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# copyright (c) 2016 Louis Lamarche
-# copyright (c) 2016-2017 Jean-Sébastien
+# Copyright (c) PyGLD Project Contributors
 # https://github.com/jnsebgosselin/pygld
 #
 # This is part of PyGLD (Python Ground-Loop Designer).
@@ -32,6 +31,7 @@ from pygld import HeatCarrierFluid
 # -------------------------------
 
 def test_antifreeze_and_fluid_error():
+    """Test that error are raised correctly for Tref and fr."""
     hcfluid = HeatCarrierFluid('water', 28)
     hcfluid.fr = 0.3
     with pytest.raises(ValueError):
@@ -47,8 +47,8 @@ def test_antifreeze_and_fluid_error():
         hcfluid.fluid = 'test'
 
 
-def test_water():
-    """ Test water properties."""
+def test_properties_of_water():
+    """ Test properties of Pure Water."""
     hcfluid = HeatCarrierFluid('water', 28)
     expected_results = [[-10, 0, 100, 998.13, 4272, nan, 0.0026477,
                          4264011.36, nan, 2.6526604750884153e-06, nan],
@@ -70,8 +70,8 @@ def test_water():
                 assert abs(val - exp_val)/exp_val*100 < 0.01
 
 
-def test_freezing_point_propglycol():
-    """Test propylene glycol freezing and boiling point."""
+def test_freezing_point_of_propglycol():
+    """Test the freezing and boiling point of Propylene Glycol."""
     hcfluid = HeatCarrierFluid('prop_glycol')
     arr_fr = [0.304, 0.204, 0.096, 0]
     arr_Tfp = [-13.4, -7.6, -3.3, 0]
@@ -85,8 +85,8 @@ def test_freezing_point_propglycol():
         assert abs(hcfluid.Tbp - Tbp)/Tbp*100 < 0.01
 
 
-def test_freezing_point_ethylglycol():
-    """Test ethylene glycol freezing and boiling point."""
+def test_freezing_point_of_ethylglycol():
+    """Test the freezing and boiling point of Ethylene Glycol."""
     hcfluid = HeatCarrierFluid('ethyl_glycol')
     arr_fr = [0.306, 0.201, 0.089, 0]
     arr_Tfp = [-16.2, -8.9, -3.2, 0]
@@ -99,6 +99,29 @@ def test_freezing_point_ethylglycol():
             assert abs(hcfluid.Tfp - Tfp)/Tfp*100 < 0.01
         assert abs(hcfluid.Tbp - Tbp)/Tbp*100 < 0.01
 
+
+def test_properties_of_propglycol():
+    """Test the properties of Propylene Glycol."""
+    hcfluid = HeatCarrierFluid('prop_glycol')
+    hcfluid.Tref = [-5, 10]
+    hcfluid.fr = 0.3
+
+    assert hcfluid.rho.tolist() == [1037.89, 1032.55]
+    assert hcfluid.cp.tolist() == [3779, 3820]
+    assert hcfluid.k.tolist() == [0.403, 0.421]
+    assert hcfluid.mu.tolist() == [0.00907, 0.00452]
+
+
+def test_properties_of_ethylglycol():
+    """Test the properties of Ethylene Glycol."""
+    hcfluid = HeatCarrierFluid('ethyl_glycol')
+    hcfluid.Tref = -5
+    hcfluid.fr = 0.3
+
+    assert abs(hcfluid.rho - 1053.11) < 10**-6
+    assert abs(hcfluid.cp - 3574) < 10**-6
+    assert abs(hcfluid.k - 0.417) < 10**-6
+    assert abs(hcfluid.mu - 0.00503) < 10**-6
 
 
 if __name__ == "__main__":

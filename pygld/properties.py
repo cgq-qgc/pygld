@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# copyright (c) 2016 Louis Lamarche
-# copyright (c) 2016-2017 Jean-Sébastien
+# Copyright (c) PyGLD Project Contributors
 # https://github.com/jnsebgosselin/pygld
 #
 # This is part of PyGLD (Python Ground-Loop Designer).
@@ -12,8 +11,6 @@ from __future__ import division, unicode_literals
 import numpy as np
 from scipy import interpolate
 import os
-import xlrd
-from collections import OrderedDict
 
 
 class HeatCarrierFluid(object):
@@ -236,4 +233,5 @@ class HeatCarrierFluid(object):
 
 
 if __name__ == '__main__':
-    HeatCarrierFluid('test')
+    hcf = HeatCarrierFluid('prop_glycol')
+    print(hcf.rho)
