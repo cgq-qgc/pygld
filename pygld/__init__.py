@@ -31,7 +31,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from pygld.properties import HeatCarrierFluid
-# from geothermie.thermal_R import *
+from pygld.thermal_resistances import *
 # from geothermie.design_glhe import (calcul_Tp_ils, calcul_Tp_fls,
 #                                     design_borefield)
 # from geothermie.g_function import (G_function_ICS, g_function_cooper,
