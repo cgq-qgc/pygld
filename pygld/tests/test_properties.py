@@ -31,7 +31,7 @@ from pygld import HeatCarrierFluid
 # Test RawDataDownloader
 # -------------------------------
 
-def test_antifreeze():
+def test_antifreeze_and_fluid_error():
     hcfluid = HeatCarrierFluid('water', 28)
     hcfluid.fr = 0.3
     with pytest.raises(ValueError):
@@ -42,6 +42,9 @@ def test_antifreeze():
 
     hcfluid.fluid = 'prop_glycol'
     assert hcfluid.fr == 0.3
+
+    with pytest.raises(ValueError):
+        hcfluid.fluid = 'test'
 
 
 def test_water():

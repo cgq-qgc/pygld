@@ -83,12 +83,12 @@ class HeatCarrierFluid(object):
         elif x == 'ethyl_glycol':
             self.__fluid = x
             filename = 'proptables_ethylglycol.npy'
-        else:
+        elif x == 'water':
             self.__fluid = 'water'
             filename = 'proptables_purewater.npy'
-            if x != 'water':
-                print('Warning: fluid not defined, setting fluid '
-                      'to pure water.')
+        else:
+            raise ValueError('Supported fluid value are',
+                             ['water', 'prop_glycol', 'ethyl_glycol'])
 
         dirname = os.path.dirname(os.path.realpath(__file__))
         pathname = os.path.join(dirname, 'tables', filename)
@@ -236,4 +236,4 @@ class HeatCarrierFluid(object):
 
 
 if __name__ == '__main__':
-    pass
+    HeatCarrierFluid('test')
