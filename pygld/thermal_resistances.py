@@ -1,72 +1,43 @@
 # -*- coding: utf-8 -*-
-"""
-Copyright 2016 INRS-ETE
 
-Authors:
---------
-Jean-Sébastien Gosselin (jean-sebastien.gosselin@ete.inrs.ca)
-Louis Lamarche (louis.lamarche@etsmtl.ca)
-Jasmin Raymond (jasmin.raymond@inrs.ca)
-
-License:
---------
-This file is part of OpenGLD.
-
-OpenGLD is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it /will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-Last modification:
-------------------
-Jean-Sébastien Gosselin
-04/10/2016
-"""
+# Copyright (c) PyGLD Project Contributors
+# https://github.com/jnsebgosselin/pygld
+#
+# This is part of PyGLD (Python Ground-Loop Designer).
+# Licensed under the terms of the MIT License.
 
 from __future__ import division, unicode_literals
-
 import numpy as np
 from numpy import (pi, log, conj, zeros, diag)
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 
 
-# ============================================================== Head Loss ====
-
+# ---- Head Loss in Pipes
 
 def calcul_dp_pipe(V, di, rho, mu):
-    # calcul the hydraulic head loss per length unit in a circular pipe
+    """
+    Calcul the hydraulic head loss per unit of length in a circular pipe.
 
-    # V: volumetric flow rate in the pipe in m3/s
-    # di: inside diameter of the pipe in m
-    # rho: fluid density in kg/m3
-    # mu: fluid viscosity in Pa/s
-
-    # ---- Calcul Reynolds number ----
+    V: volumetric flow rate in the pipe in m3/s
+    di: inside diameter of the pipe in m
+    rho: fluid density in kg/m3
+    mu: fluid viscosity in Pa/s
+    """
+    # Calcul the Reynolds number :
 
     A = np.pi * di**2/4
     w = V / A
     Re = rho * w / mu * di
 
-    print()
-    print('Re in pipes = %0.0f' % Re)
-
-    # ---- Calcul Friction factor :
+    # Calcul Friction factor :
 
     if Re < 2300:
-        f_pipe = 64/Re   # Laminar flow
+        # The flow is laminar.
+        f_pipe = 64/Re
     else:
-        f_pipe = 0.3164 * Re**(-1/4)  # Turbulent flow
+        # The flow is turbulent.
+        f_pipe = 0.3164 * Re**(-1/4)
 
-    # ---- Calcul dp in Pa/m ----
+    # Calcul the pressure drop in Pa/m :
 
     dp = f_pipe * (1/di) * (rho*w**2/2)
 
@@ -74,20 +45,21 @@ def calcul_dp_pipe(V, di, rho, mu):
 
 
 def calcul_dp_ann(V, d1, d2, rho, mu):
+    """
+    Calcul the hydraulic head loss per unit of length in the annulus for
+    the concentric borehole design
 
-    # calcul the hydraulic head loss per unit length in the annulus for
-    # the concentric borehole design
-
-    # d1: outer diameter of the annulus
-    # d2: inner diameter of the annulus
-    # V: Volumetric flow inside the annulus in m3/s
-    # rho: fluid density in kg/m3
-    # mu: fluid viscosity in Pa/s
+    d1: outer diameter of the annulus
+    d2: inner diameter of the annulus
+    V: Volumetric flow inside the annulus in m3/s
+    rho: fluid density in kg/m3
+    mu: fluid viscosity in Pa/s
+    """
 
     if d2 >= d1:
         raise ValueError('d1 must be greater than d2.')
 
-    # ---- Calcul Reynolds number ----
+    # ---- Calcul the Reynolds number :
 
     dh = d1 - d2
 
@@ -95,74 +67,25 @@ def calcul_dp_ann(V, d1, d2, rho, mu):
     w = V / A
     Re = rho * w / mu * dh
 
-    print()
-    print('Re in annulus = %0.0f' % Re)
-
     # ---- Calcul Friction factor :
 
     a = d2/d1
     Ree = Re * ((1+a**2)*np.log(a) + (1-a**2)) / ((1-a**2)*np.log(a))
-
     if Ree < 2300:
-        f = 64/Ree  # Laminar flow
+        # The flow is laminar.
+        f = 64/Ree
     else:
-        f = (1.8*np.log10(Ree)-1.5)**-2  # Turbulent flow
+        # The flow is turbulent.
+        f = (1.8*np.log10(Ree)-1.5)**-2
 
-    # ---- Calcul dp in Pa/m ----
+    # ---- Calcul the pressure drop in Pa/m :
 
     dp = f * (1/dh) * (rho*w**2/2)
 
     return dp
 
 
-# ===================================================== Thermal Resistance ====
-
-
-def calcul_Rb_linesource(ki, k, rb, r1, xc):
-    # ki : grout thermal conductivity
-    # k  : soil thermal conductivity
-    # rb : borehole radius
-    # r1 : pipe outside radius
-    # xc : demi-distance des tuyaux
-
-    sig = (ki-k)/(ki+k)
-    b11 = xc/rb
-    # b22 = b11
-    # b12 = 2*xc/rb
-
-    la1 = rb/r1
-    la2 = rb/xc
-    # la3 = la2/(2*la1)
-
-    Rb = (log(la1) +
-          log(la2/2) +
-          sig*log(la2**4/(la2**4-1))
-          ) / (4*pi*ki)
-
-    Ra = (log(2*xc/r1) + sig*log((1+b11**2) / (1-b11**2))) / (pi*ki)
-
-    return Rb, Ra
-
-
-def calcul_Rb_Paul(kg, rb, rp, cas):
-    # calcul resistance Redmund
-
-    if cas.lower() == 'a':
-        beta0 = 20.10
-        beta1 = -0.94447
-    elif cas.lower() == 'b':
-        beta0 = 17.44
-        beta1 = -0.6052
-    elif cas.lower() == 'c':
-        beta0 = 21.90587
-        beta1 = -0.3796
-    else:
-        print('error, cas = a b or c')
-
-    Sb = beta0 * (rb/rp)**beta1
-    Rg = 1. / (kg*Sb)
-
-    return Rg
+# ---- Nusselt Number
 
 
 def calcul_Nu_pipe(Re, Pr):
@@ -211,6 +134,91 @@ def calcul_Nu_pipe(Re, Pr):
 
     return Num
 
+
+def calcul_Nu_annulus(Re, Pr, a):
+    """
+    Compute mean Nusselt number for a flow in an annular space between two
+    concentric circular pipes.
+
+    Num = calcul_Nu_annulus(Re, Pr, a)
+
+    Re = Reynolds number formed with the hydraulic diameter dh = do-di, where
+         do and di are, respectively, the outer and inner diameter of the
+         annulus.
+    Pr = Prandtl number
+    a = ratio of the inner and outer diameter of the annulus (a = di/do),
+        where 0 >= a >= 1.
+    Num = mean Nusselt number
+
+    References:
+    Baehr H.D. and K. Stephan, 2006. Heat and Mass Transfer. Second ed.
+    Springer-Verlag, Berlin, Heidelberd. p.370-372.
+
+    - Valid for thermally and hydrodynamic fully developped flow
+    - Valid for small temperature differences between the flow and the wall
+    """
+
+    Nu_tube = calcul_Nu_pipe(Re, Pr)
+
+    if Re < 2300:  # Laminar flow
+        # Heat is transferred at both the inner and outer tubes.
+        Num = 3.657 + (4 - 0.102/(0.02 + a)) * a**0.04  # Asymptotic value
+
+    elif Re >= 2300:  # Transition + turbulent flow
+        # Heat is transferred at the inner tube. The outer tube is insulated.
+        Nuii = Nu_tube * (0.86 * a**-0.16)
+
+        # Heat is transferred at the outer tube. The inner tube is insulated.
+        Nuoo = Nu_tube * (1 - 0.14*a**0.6)
+
+        # Heat is transferred at both the inner and outer tubes.
+        Num = (Nuii + Nuoo) / (1 + a)
+
+    return Num
+
+
+def calcul_Nu_annulus2(Re, Pr, a):
+    """
+    Using VDI Waermeatlas inster of Baehr
+
+    Compute mean Nusselt number for a flow in an annular space between two
+    concentric circular pipes.
+
+    Num = calcul_Nu_annulus(Re, Pr, a)
+
+    Re = Reynolds number formed with the hydraulic diameter dh = do-di, where
+         do and di are, respectively, the outer and inner diameter of the
+         annulus.
+    Pr = Prandtl number
+    a = ratio of the inner and outer diameter of the annulus (a = di/do),
+        where 0 >= a >= 1.
+    Num = mean Nusselt number
+
+
+    - Valid for thermally and hydrodynamic fully developped flow
+    - Valid for small temperature differences between the flow and the wall
+    """
+
+    Nu_tube = calcul_Nu_tube(Re, Pr)
+
+    if Re < 2300:  # Laminar flow
+        # Heat is transferred at both the inner and outer tubes.
+        Num = 3.66 + (4 - 0.102/(0.02 + a)) * a**0.04  # Asymptotic value
+
+    elif Re >= 2300:  # Transition + turbulent flow
+        # Heat is transferred at the inner tube. The outer tube is insulated.
+        Nuii = Nu_tube * (0.86 * a**-0.16)
+
+        # Heat is transferred at the outer tube. The inner tube is insulated.
+        Nuoo = Nu_tube * (1 - 0.14*a**0.6)
+
+        # Heat is transferred at both the inner and outer tubes.
+        Num = (Nuii + Nuoo) / (1 + a)
+
+    return Num
+
+
+# ---- Pipes Thermal Resistance
 
 def calcul_Rconv_pipe(ri, Vf, muf, kf, rhof, Pr):
     """
@@ -300,88 +308,7 @@ def calcul_Rp(kp, rpi, rpo, Vf, muf, kf, rhof, Pr):
     return Rp
 
 
-def calcul_Nu_annulus(Re, Pr, a):
-    """
-    Compute mean Nusselt number for a flow in an annular space between two
-    concentric circular pipes.
-
-    Num = calcul_Nu_annulus(Re, Pr, a)
-
-    Re = Reynolds number formed with the hydraulic diameter dh = do-di, where
-         do and di are, respectively, the outer and inner diameter of the
-         annulus.
-    Pr = Prandtl number
-    a = ratio of the inner and outer diameter of the annulus (a = di/do),
-        where 0 >= a >= 1.
-    Num = mean Nusselt number
-
-    References:
-    Baehr H.D. and K. Stephan, 2006. Heat and Mass Transfer. Second ed.
-    Springer-Verlag, Berlin, Heidelberd. p.370-372.
-
-    - Valid for thermally and hydrodynamic fully developped flow
-    - Valid for small temperature differences between the flow and the wall
-    """
-
-    Nu_tube = calcul_Nu_pipe(Re, Pr)
-
-    if Re < 2300:  # Laminar flow
-        # Heat is transferred at both the inner and outer tubes.
-        Num = 3.657 + (4 - 0.102/(0.02 + a)) * a**0.04  # Asymptotic value
-
-    elif Re >= 2300:  # Transition + turbulent flow
-        # Heat is transferred at the inner tube. The outer tube is insulated.
-        Nuii = Nu_tube * (0.86 * a**-0.16)
-
-        # Heat is transferred at the outer tube. The inner tube is insulated.
-        Nuoo = Nu_tube * (1 - 0.14*a**0.6)
-
-        # Heat is transferred at both the inner and outer tubes.
-        Num = (Nuii + Nuoo) / (1 + a)
-
-    return Num
-
-
-def calcul_Nu_annulus2(Re, Pr, a):
-    """
-    Using VDI Waermeatlas inster of Baehr
-
-    Compute mean Nusselt number for a flow in an annular space between two
-    concentric circular pipes.
-
-    Num = calcul_Nu_annulus(Re, Pr, a)
-
-    Re = Reynolds number formed with the hydraulic diameter dh = do-di, where
-         do and di are, respectively, the outer and inner diameter of the
-         annulus.
-    Pr = Prandtl number
-    a = ratio of the inner and outer diameter of the annulus (a = di/do),
-        where 0 >= a >= 1.
-    Num = mean Nusselt number
-
-
-    - Valid for thermally and hydrodynamic fully developped flow
-    - Valid for small temperature differences between the flow and the wall
-    """
-
-    Nu_tube = calcul_Nu_tube(Re, Pr)
-
-    if Re < 2300:  # Laminar flow
-        # Heat is transferred at both the inner and outer tubes.
-        Num = 3.66 + (4 - 0.102/(0.02 + a)) * a**0.04  # Asymptotic value
-
-    elif Re >= 2300:  # Transition + turbulent flow
-        # Heat is transferred at the inner tube. The outer tube is insulated.
-        Nuii = Nu_tube * (0.86 * a**-0.16)
-
-        # Heat is transferred at the outer tube. The inner tube is insulated.
-        Nuoo = Nu_tube * (1 - 0.14*a**0.6)
-
-        # Heat is transferred at both the inner and outer tubes.
-        Num = (Nuii + Nuoo) / (1 + a)
-
-    return Num
-
+# ---- Coaxial Thermal Resistance
 
 def calcul_hf_annulus(ri, ro, Vf, muf, kf, rhof, Pr):
 
@@ -478,7 +405,7 @@ def calcul_Rb_coaxial(rb, kp, rpi, rpo, kgrout, Vf, muf, kf, rhof, Pr):
         raise ValueError('Inner pipe ouside diameter is greater than '
                          'outer pipe inside diameter.')
 
-    # ------------------------------------ Internal thermal resistance, Ra ----
+    # ---- Internal thermal resistance, Ra
 
     # The thermal resistance between the inner and the outer flow channel
     # (internal thermal resistance) consists of:
@@ -500,7 +427,7 @@ def calcul_Rb_coaxial(rb, kp, rpi, rpo, kgrout, Vf, muf, kf, rhof, Pr):
     # The internal thermal resistance is:
     Ra = Rconv_p1_int + Rcond_p1 + Rconv_p1_ext
 
-    # ------------------------------------ External thermal resistance, Rb ----
+    # ---- External thermal resistance, Rb
 
     # The thermal resistance between the outer flow channel and the borehole
     # wall is composed of three parts:
@@ -517,7 +444,53 @@ def calcul_Rb_coaxial(rb, kp, rpi, rpo, kgrout, Vf, muf, kf, rhof, Pr):
     return Rb, Ra, Rcond_p2, Rconv_p2, Rgrout
 
 
-# ---- Borehole thermal resistance
+# ---- U-pipe Borehole Thermal Resistance
+
+def calcul_Rb_linesource(ki, k, rb, r1, xc):
+    # ki : grout thermal conductivity
+    # k  : soil thermal conductivity
+    # rb : borehole radius
+    # r1 : pipe outside radius
+    # xc : demi-distance des tuyaux
+
+    sig = (ki-k)/(ki+k)
+    b11 = xc/rb
+    # b22 = b11
+    # b12 = 2*xc/rb
+
+    la1 = rb/r1
+    la2 = rb/xc
+    # la3 = la2/(2*la1)
+
+    Rb = (log(la1) +
+          log(la2/2) +
+          sig*log(la2**4/(la2**4-1))
+          ) / (4*pi*ki)
+
+    Ra = (log(2*xc/r1) + sig*log((1+b11**2) / (1-b11**2))) / (pi*ki)
+
+    return Rb, Ra
+
+
+def calcul_Rb_Paul(kg, rb, rp, cas):
+    # calcul resistance Redmund
+    if cas.lower() == 'a':
+        beta0 = 20.10
+        beta1 = -0.94447
+    elif cas.lower() == 'b':
+        beta0 = 17.44
+        beta1 = -0.6052
+    elif cas.lower() == 'c':
+        beta0 = 21.90587
+        beta1 = -0.3796
+    else:
+        print('error, cas = a b or c')
+
+    Sb = beta0 * (rb/rp)**beta1
+    Rg = 1/(kg*Sb)
+
+    return Rg
+
 
 def calcul_Rb_Sharqawi(kg, rb, rp, xc):
     # calcul resistance Redmund
@@ -581,7 +554,7 @@ def calcul_Rb_multipoles(kb, ks, rb, rp, Rp, Jp, z):
             while 1:
                 for n in range(N):
                     for ik in range(Jp):
-                        F[n, ik] = Calcul_F(q, P, rp, rb, kb, sig,
+                        F[n, ik] = calcul_F(q, P, rp, rb, kb, sig,
                                             n, ik, Jp, N, z)
                         P[n, ik] = ((-1 + (ik+1)*beta) /
                                     (1 + (ik+1)*beta) *
@@ -659,10 +632,8 @@ def calcul_Rb_multipoles(kb, ks, rb, rp, Rp, Jp, z):
     return Rb, Ra
 
 
-def Calcul_F(q, P, rp, rb, kb, sig, m, km, Jp, N, z):
-
-    # Eq.34 in Claesson and Hellstrom (2012)
-
+def calcul_F(q, P, rp, rb, kb, sig, m, km, Jp, N, z):
+    """Calcul Eq.34 in Claesson and Hellstrom (2011)."""
     k = km+1
     sa = 0
     for i in range(N):
@@ -700,15 +671,14 @@ def Calcul_F(q, P, rp, rb, kb, sig, m, km, Jp, N, z):
 
 def combinaisons(n, k):
     if k == 0:
-        C = 1
+        return 1
     elif k == 1:
-        C = n
+        return n
     else:
         p = n-k+1
         for i in range(2, k+1):
             p = p*(n-k+i)/(i*1.0)
-        C = p
-    return C
+        return p
 
 
 # ---- 3D Borehole thermal resistance
