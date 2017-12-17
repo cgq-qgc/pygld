@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+proptables_ethylglycol.xls
+proptables_propglycol.xls
+proptables_purewater.xls
+setup_fluid_tables.py
+
