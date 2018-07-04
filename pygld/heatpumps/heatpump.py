@@ -20,6 +20,7 @@ from scipy.spatial import Delaunay
 
 from pygld.fluidproperties import HeatCarrierFluid
 from pygld.heatpumps.utils import load_heatpump_database
+from pygld.heatpumps.plots import plot_fitmodel_eval_from
 
 corrtbl_afreeze = {}
 
@@ -188,44 +189,52 @@ class HeatPump(object):
         return ToutHP
 
     def interp(self, varname, ewt, gpm):
-        # ewt: entering water temperature in the HP (ºC)
-        # gpm: columetric flowrate in the HP (L/s)
+        """
+        Evaluate the heatpump <varname> at the specifived ewt and gpm value
+        with the equation-fit model.
+
+        varname : COPc, COPh, CAPc, CAPh
+        ewt : entering water temperature in the HP (ºC)
+        gpm : volumetric flowrate in the HP (L/s)
+        """
 
         A = self._hpdb[self.hpname]['models'][varname]
 
-        var = (A[0] +
-               A[1]*ewt + A[2]*ewt**2 +
-               A[3]*gpm + A[4]*gpm**2 +
-               A[5]*ewt*gpm
-               )
+        y = (A[0] +
+             A[1]*ewt + A[2]*ewt**2 +
+             A[3]*gpm + A[4]*gpm**2 +
+             A[5]*ewt*gpm)
 
-        # Anti-freeze correction factor :
+        # Get the anti-freeze correction factor.
 
         afcorr = np.interp(self.fr,
                            corrtbl_afreeze[self.fluid]['fr'],
-                           corrtbl_afreeze[self.fluid][varname]
-                           )
+                           corrtbl_afreeze[self.fluid][varname])
 
-        return var*afcorr
+        return y * afcorr
 
-    def in_table(self, varname, x1, y1):
-        x = self._hpdb[self.hpname]['EWT']
-        y = self._hpdb[self.hpname]['GPM']
-        z = self._hpdb[self.hpname][varname]
+    def in_table(self, varname, p1, p2):
+        """
+        Check whether the (p1, p2) point is inside or outside the data table
+        for the specified variable. COP or CAP values evaluated outside the
+        data table (extrapolation) must be used with care.
 
-        # remove nan values :
-        indx = np.where(~np.isnan(z))[0]
-        x = x[indx]
-        y = y[indx]
+        Based on this stackoverflow answer:
+        http://stackoverflow.com/a/16898636/4481445
+        """
+        y = self._hpdb[self.hpname][varname]
+        indx = np.where(~np.isnan(y))[0]
 
-        # Check if point is inside the table :
-        # http://stackoverflow.com/a/16898636/4481445
+        x1 = self._hpdb[self.hpname]['EWT'][indx]
+        x2 = self._hpdb[self.hpname]['GPM'][indx]
 
-        hull = Delaunay(np.vstack((x, y)).T)
-
-        return bool(hull.find_simplex((x1, y1)) >= 0)
+        hull = Delaunay(np.vstack((x1, x2)).T)
+        return bool(hull.find_simplex((p1, p2)) >= 0)
 
     def get_flowRange(self):
+        """
+        Return the minimum and maximum operational flowrate of the heatpump.
+        """
         vmax = np.max(self._hpdb[self.hpname]['GPM']) * self.Nhp
         vmin = np.min(self._hpdb[self.hpname]['GPM']) * self.Nhp
         return vmin, vmax
@@ -249,15 +258,6 @@ class HeatPump(object):
             return self.interp('CAPc', self.TinHP[mode], self.Vhp[mode])
         elif mode == 'heating':
             return self.interp('CAPh', self.TinHP[mode], self.Vhp[mode])
-#
-#    def get_Whp(self, mode):
-#        if mode == 'cooling':
-#            return self.interp('Wc', self.TinHP[mode], self.Vhp[mode])
-#        elif mode == 'heating':
-#            return self.interp('Wh', self.TinHP[mode], self.Vhp[mode])
-#
-#    def get_WPD(self, mode):
-#        return self.interp('WPD', self.TinHP[mode], self.Vhp[mode])
 
     # ---- Utility methods
 
