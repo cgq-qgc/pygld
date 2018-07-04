@@ -74,7 +74,7 @@ class HeatPump(object):
 
         self.TinHP = {'cooling': 28, 'heating': 0}
         self.Nhp = 1
-        self.hpname = self.hpDB.keys()[0]
+        self.set_hpname(0)
 
     def __initAttr__(self):
         """
@@ -87,9 +87,7 @@ class HeatPump(object):
         Tg    : undisturbed ground temperature in ºC
         """
 
-        hpfile = os.path.dirname(os.path.realpath(__file__))
-        hpfile = os.path.join(hpfile, 'tables', 'heatpumps', 'hp_database.npy')
-        self.hpDB = np.load(hpfile).item()
+        self._hpdb = load_heatpump_database()
 
         self.qbat = {'cooling': 16.5, 'heating': 14.5}
         self.fluid = 'water'
