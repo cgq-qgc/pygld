@@ -9,19 +9,17 @@
 # ---- Standard imports
 
 import os
-import csv
-from collections import OrderedDict
+import os.path as osp
 
 # ---- Third party imports
 
 import numpy as np
-from scipy import interpolate
-from scipy.spatial import ConvexHull
 from scipy.spatial import Delaunay
 
 # ---- Local imports
 
-from pygld.properties_mod import HCFluid
+from pygld.fluidproperties import HeatCarrierFluid
+from pygld.heatpumps.utils import load_heatpump_database
 
 corrtbl_afreeze = {}
 
