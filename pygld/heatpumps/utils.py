@@ -19,8 +19,24 @@ import numpy as np
 
 # ---- Local imports
 
+from pygld.heatpumps import __datadir__
 
-def build_database(dirname):
+
+def load_heatpump_database(dirname=None):
+    """
+    Load the database from the specified directory or create it if it does
+    not exist.
+    """
+    dirname = __datadir__ if dirname is None else dirname
+
+    hpfile = os.path.join(dirname, 'hp_database.npy')
+    if not osp.exists(hpfile):
+        build_heatpump_database(dirname)
+
+    return np.load(hpfile).item()
+
+
+def build_heatpump_database(dirname):
     """
     Build a database of heat pumps performance data from a list of
     formatted csv files located within the specified directory name.
@@ -83,6 +99,9 @@ def load_heatpump_table_fromfile(filename):
 
                 data['Wc'] = A[:, 4]
                 data['Wh'] = A[:, 7]
+
+                data['COPc'] = data['CAPc'] / data['Wc']
+                data['COPh'] = data['CAPh'] / data['Wh']
                 break
 
     # Use the performance data to build an equation-fit model of the form :
@@ -107,8 +126,8 @@ def load_heatpump_table_fromfile(filename):
     data['models']['CAPc'] = multi_polyfit2nd(data['CAPc'], x1, x2)
     data['models']['CAPh'] = multi_polyfit2nd(data['CAPh'], x1, x2)
 
-    data['models']['COPc'] = multi_polyfit2nd(data['CAPc']/data['Wc'], x1, x2)
-    data['models']['COPh'] = multi_polyfit2nd(data['CAPh']/data['Wh'], x1, x2)
+    data['models']['COPc'] = multi_polyfit2nd(data['COPc'], x1, x2)
+    data['models']['COPh'] = multi_polyfit2nd(data['COPh'], x1, x2)
 
     return data
 
@@ -140,7 +159,5 @@ def multi_polyfit2nd(y, x1, x2):
 
 
 if __name__ == '__main__':
-    from pygld.heatpumps import __datadir__
-
     input_fname = osp.join(__datadir__, 'TCHV072.hp')
     data_TCHV072 = load_heatpump_table_fromfile(input_fname)

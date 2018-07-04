@@ -17,7 +17,7 @@ import pytest
 
 # ---- Local imports
 
-from pygld.heatpumps.utils import build_database
+from pygld.heatpumps.utils import build_heatpump_database
 from pygld.utils.fileio import delete_file_safely
 from pygld.heatpumps import __datadir__
 
@@ -34,11 +34,11 @@ def test_build_database(qtbot):
     # exist.
 
     with pytest.raises(FileNotFoundError):
-        build_database('dummy')
+        build_heatpump_database('dummy')
 
     # Build the database and assert that a file was created as expected.
 
-    filename = build_database(__datadir__)
+    filename = build_heatpump_database(__datadir__)
     assert filename == expected_filename
     assert osp.exists(expected_filename)
 
