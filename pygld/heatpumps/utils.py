@@ -26,14 +26,15 @@ def build_database(dirname):
     formatted csv files located within the specified directory name.
     """
     db = OrderedDict()
-    for f in os.listdir(dirname):
-        if f.endswith('.csv'):
-            try:
-                dat = load_HP_table_fromfile(os.path.join(dirname, f))
-                name = dat['model']
-                db[name] = dat
-            except Exception:
-                print('unable to load data from %s' % f)
+
+    files = [osp.join(dirname, f) for
+             f in os.listdir(dirname) if f.endswith('.hp')]
+    for file in files:
+        try:
+            data = load_heatpump_table_fromfile(file)
+            db[data['model']] = data
+        except Exception:
+            print('unable to load data from %s' % file)
 
     filename = osp.join(dirname, 'hp_database.npy')
     np.save(filename, db)
@@ -41,7 +42,7 @@ def build_database(dirname):
     return filename
 
 
-def load_HP_table_fromfile(filename):
+def load_heatpump_table_fromfile(filename):
     """
     Load heat pump performance data from the specified csv file and format
     the data in a dictionary.
