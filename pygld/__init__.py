@@ -30,17 +30,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from pygld.properties import HeatCarrierFluid
-from pygld.thermal_resistances import *
-from geothermie.design_glhe import (calcul_Tp_ils, calcul_Tp_fls,
-                                    design_borefield)
-from geothermie.g_functions import (G_function_ICS, g_function_cooper,
-                                    g_function_bernier, G_function_ILS,
-                                    G_function_FLS, G_function_lamarche)
-from geothermie.bh_geometrie import (TLB, calcul_sdr, plot_borehole,
-                                     FigBoreholeGeo)
-
-from geothermie.glhe_design import OpenGLDesignerBase
+from pygld.fluidproperties import HeatCarrierFluid
+from pygld.heatpumps.heatpump import HeatPump
 
 import os
 import sys
