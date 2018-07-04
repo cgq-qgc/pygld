@@ -123,16 +123,16 @@ def load_heatpump_table_fromfile(filename):
     x1 = data['EWT']
     x2 = data['GPM']
 
-    data['models']['CAPc'] = multi_polyfit2nd(data['CAPc'], x1, x2)
-    data['models']['CAPh'] = multi_polyfit2nd(data['CAPh'], x1, x2)
+    data['models']['CAPc'] = multi_polyfit2rd(data['CAPc'], x1, x2)
+    data['models']['CAPh'] = multi_polyfit2rd(data['CAPh'], x1, x2)
 
-    data['models']['COPc'] = multi_polyfit2nd(data['COPc'], x1, x2)
-    data['models']['COPh'] = multi_polyfit2nd(data['COPh'], x1, x2)
+    data['models']['COPc'] = multi_polyfit2rd(data['COPc'], x1, x2)
+    data['models']['COPh'] = multi_polyfit2rd(data['COPh'], x1, x2)
 
     return data
 
 
-def multi_polyfit2nd(y, x1, x2):
+def multi_polyfit2rd(y, x1, x2):
     """
     Calculate the coefficient of a second order polynomial expression in two
     variables of the form :
