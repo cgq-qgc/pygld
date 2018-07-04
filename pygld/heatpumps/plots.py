@@ -17,12 +17,11 @@ from matplotlib.ticker import MaxNLocator
 # ---- Local imports
 
 from pygld.heatpumps.utils import load_heatpump_database
-from pygld.heatpumps.heatpump import HeatPump
 
 
 def plot_fitmodel_eval_from(hpdata):
     """
-    Compared the measured COP and CAP values with those evaluated with the
+    Compare the measured COP and CAP values with those evaluated with the
     equation-fit model.
     """
     hpname = hpdata['model']
@@ -39,7 +38,7 @@ def plot_fitmodel_eval_from(hpdata):
     for i, (varname, axe, color) in enumerate(iterables):
         y = hpdata[varname]
 
-        # Remove the nan values from the dataset.
+        # Remove the nan values from the dataset and assign x1 and x2 data.
 
         indx = np.where(~np.isnan(y))[0]
         y = y[indx]
@@ -79,43 +78,9 @@ def plot_fitmodel_eval_from(hpdata):
     plt.show()
 
 
-def plot_cop():
-    plt.close('all')
-
-    w = HeatPump()
-
-    w.hpname = 'Generic'
-    w.hpname = 'TCHV300'
-    # y = w.hpdata['CAPh']/w.hpdata['Wh']
-    y = w.hpdata['CAPc']/w.hpdata['Wc']
-    x1 = w.hpdata['EWT']
-    x2 = w.hpdata['GPM']
-    A = linalg_hp(y, x1, x2)
-
-    print(w.get_flowRange())
-
-    fig, ax = plt.subplots()
-
-    ewt = np.arange(-1, 35)
-#    flowrange = np.arange(w.get_flowRange()[0], w.get_flowRange()[1], 0.25)
-    flowrange = np.arange(2.37, 4.73, 0.25)
-
-    for val in flowrange:
-        gpm = np.ones(len(ewt)) * val
-
-        cop = (A[0] +
-               A[1]*ewt + A[2]*ewt**2 +
-               A[3]*gpm + A[4]*gpm**2 +
-               A[5]*ewt*gpm
-               )
-        ax.plot(ewt, cop, '-')
-
-    plt.show()
-
-
 if __name__ == '__main__':
+    from pygld.heatpumps.heatpump import HeatPump
     plt.close('all')
-
     database = load_heatpump_database()
     hpnames = list(database.keys())
     for hpname in hpnames:
