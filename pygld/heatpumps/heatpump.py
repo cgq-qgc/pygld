@@ -105,6 +105,31 @@ class HeatPump(object):
     def hpdata(self):
         return self.hpDB[self.hpname]
         """Return the performance data table of the heat pump."""
+    @property
+    def hpnames(self):
+        """Return a list of all available heatpumps in the database."""
+        return list(self._hpdb.keys())
+
+    @property
+    def hpname(self):
+        """Return the name of the current heat pump."""
+        return self._hpname
+
+    def set_hpname(self, value):
+        """
+        Set the name of the heatpump either from an index or a key. If the
+        index or key is not found in the database, an error is raised.
+        """
+        if isinstance(value, int):
+            self._hpname = self.hpnames[0]
+        elif isinstance(value, str):
+            if value in list(self._hpdb.keys()):
+                self._name = value
+            else:
+                raise ValueError("Heatpump '%s' not found in the database"
+                                 % value)
+        else:
+            raise TypeError("'value' must be either an int or a str")
 
     @property
     def ToutHP(self):
