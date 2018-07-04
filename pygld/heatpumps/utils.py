@@ -53,6 +53,9 @@ def load_heatpump_table_fromfile(filename):
     WPDh : pressure drop in the coil for the heating mode in Pa
     Wc   : work of the heat pump for the cooling mode in kW
     Wh   : work of the heat pump for the heating mode in kW
+
+    Note that the data in the input csv files are in imperial units, so we need
+    to convert the values in SI format.
     """
     with open(filename, 'r', encoding='utf8') as f:
         reader = list(csv.reader(f))
@@ -65,64 +68,79 @@ def load_heatpump_table_fromfile(filename):
                 data['model'] = row[1]
                 print('Loading %s data sheet...' % row[1])
             elif row[0] == 'Nominal CAP (tons)':
-                data['Nominal CAP'] = float(row[1])*3.51685
+                data['Nominal CAP'] = float(row[1]) * 3.51685
             elif row[0] == 'EWT (F)':
                 A = np.array(reader[i+1:]).astype(float)
 
-                data['EWT'] = (A[:, 0]-32)/1.8
-                data['GPM'] = A[:, 1]/15.8503230745
+                data['EWT'] = (A[:, 0]-32) / 1.8
+                data['GPM'] = A[:, 1] / 15.8503230745
 
-                data['WPDc'] = A[:, 2]*6894.76
-                data['WPDh'] = A[:, 5]*6894.76
+                data['WPDc'] = A[:, 2] * 6894.76
+                data['WPDh'] = A[:, 5] * 6894.76
 
-                data['CAPc'] = A[:, 3]*0.293071
-                data['CAPh'] = A[:, 6]*0.293071
+                data['CAPc'] = A[:, 3] * 0.293071
+                data['CAPh'] = A[:, 6] * 0.293071
 
                 data['Wc'] = A[:, 4]
                 data['Wh'] = A[:, 7]
                 break
+
+    # Use the performance data to build an equation-fit model of the form :
+
+    # y = a1 + a2*EWT + a3*EWT^2 + a4*GPM, a5*GPM^2 + a6*EWT*GPM
+
+    # where ai are the coefficients, EWT is the entering temperature in the
+    # heat pump, GPM is the flow rate and y is the variable that we want to
+    # model, namely the coefficient of performance and capacity in cooling
+    # and heating mode.
+
+    # This is based on Equations 19 and 20 in :
+    # Jin, H. and J.D.Spitler, 2002. A parameter estimation based model of
+    # water-to-water heat pumps for use in energy calculation programs.
+    # ASHRAE Transactions: Research, 108(1): 3-17
 
     data['models'] = {}
 
     x1 = data['EWT']
     x2 = data['GPM']
 
-    data['models']['CAPc'] = linalg_hp(data['CAPc'], x1, x2)
-    data['models']['CAPh'] = linalg_hp(data['CAPh'], x1, x2)
+    data['models']['CAPc'] = multi_polyfit2nd(data['CAPc'], x1, x2)
+    data['models']['CAPh'] = multi_polyfit2nd(data['CAPh'], x1, x2)
 
-    data['models']['COPc'] = linalg_hp(data['CAPc']/data['Wc'], x1, x2)
-    data['models']['COPh'] = linalg_hp(data['CAPh']/data['Wh'], x1, x2)
+    data['models']['COPc'] = multi_polyfit2nd(data['CAPc']/data['Wc'], x1, x2)
+    data['models']['COPh'] = multi_polyfit2nd(data['CAPh']/data['Wh'], x1, x2)
 
     return data
 
 
-def linalg_hp(y, x1, x2):
+def multi_polyfit2nd(y, x1, x2):
+    """
+    Calculate the coefficient of a second order polynomial expression in two
+    variables of the form :
+
+    y = a1 + a2*x1 + a3*x1^2 + a4*x2, a5*x2^2 + a6*x1*x2
+
+    where y is the dependent variable, x1 and x2 are the independent variables,
+    and ai are the coefficients of the model.
+    """
+
+    # Remove nan values in the dataset.
 
     indx = np.where(~np.isnan(y))[0]
-
     y = y[indx]
     x1 = x1[indx]
     x2 = x2[indx]
 
-    B = y
-    A = np.column_stack([np.ones(len(y)), x1, x1**2, x2, x2**2, x1*x2])
+    # Organize the data in the form : Ax = y
 
-    A = np.linalg.lstsq(A, B)[0]
+    x = np.column_stack([np.ones(len(y)), x1, x1**2, x2, x2**2, x1*x2])
+    A = np.linalg.lstsq(x, y)[0]
 
     return A
 
 
 if __name__ == '__main__':
-    build_database()
+    from pygld.heatpumps import __datadir__
 
-#     import matplotlib.pyplot as plt
-
-# #    eval_model()
-# #    plot_cop()
-# #
-#     w = HeatPump()
-# #    w.setFixedSize(w.size())
-#     w.setCurrentUnitSystem('SI')
-
-#     w.set_Vftot({'cooling': 12.5/15.8503230745/1000,
-#                  'heating': 12.5/15.8503230745/1000})
+    input_fname = osp.join(__datadir__, 'TCHV072.hp')
+    data_TCHV072 = load_heatpump_table_fromfile(input_fname)
