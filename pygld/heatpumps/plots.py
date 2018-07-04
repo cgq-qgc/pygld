@@ -8,48 +8,73 @@
 
 # ---- Standard imports
 
-import os
-import csv
-from collections import OrderedDict
-
 # ---- Third party imports
 
 import numpy as np
-from scipy import interpolate
-from scipy.spatial import ConvexHull
-from scipy.spatial import Delaunay
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 # ---- Local imports
 
+from pygld.heatpumps.utils import load_heatpump_database
 from pygld.heatpumps.heatpump import HeatPump
 
 
-def eval_model():
+def plot_fitmodel_eval_from(hpdata):
+    """
+    Compared the measured COP and CAP values with those evaluated with the
+    equation-fit model.
+    """
+    hpname = hpdata['model']
+    title = ("Evaluation of equation-fit models\n"
+             "for heatpump %s") % hpname
+    fig, axes = plt.subplots(2, 2)
+    fig.set_size_inches(6, 6)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
 
-    plt.close('all')
+    varnames = ['CAPc', 'CAPh', 'COPc', 'COPh']
+    colors = ['#e41a1c', '#377eb8', '#4daf4a', '#ff7f00']
+    iterables = zip(varnames, axes.flatten(), colors)
+    for i, (varname, axe, color) in enumerate(iterables):
+        y = hpdata[varname]
 
-    w = HeatPump()
+        # Remove the nan values from the dataset.
 
-    for name in ['TCHV072', 'TCHV096', 'TCHV120', 'TCHV160', 'TCHV192',
-                 'TCHV240', 'TCHV300', 'Generic']:
-        w.hpname = name
+        indx = np.where(~np.isnan(y))[0]
+        y = y[indx]
+        x1 = hpdata['EWT'][indx]
+        x2 = hpdata['GPM'][indx]
 
-        y = w.hpdata['CAPh']/w.hpdata['Wh']
-        x1 = w.hpdata['EWT']
-        x2 = w.hpdata['GPM']
-        A = linalg_hp(y, x1, x2)
+        # Predict the heatpumps COP or CAP
 
+        A = hpdata['models'][varname]
         yp = (A[0] +
               A[1]*x1 + A[2]*x1**2 +
               A[3]*x2 + A[4]*x2**2 +
               A[5]*x1*x2
               )
 
-        fig, ax = plt.subplots()
-        fig.canvas.set_window_title(name)
-        ax.plot([np.floor(np.min(yp)), np.ceil(np.max(yp))],
-                [np.floor(np.min(yp)), np.ceil(np.max(yp))], '--k')
-        ax.plot(y, yp, 'o')
+        # Plot the comparison between the predicted and measured data.
+
+        axe.plot(y, yp, 'o', ms=3, color=color, clip_on=False, zorder=10)
+        axe.set_xlabel('measured %s' % varname)
+        axe.set_ylabel('predicted %s' % varname)
+
+        axe.set_aspect('equal')
+        axe.xaxis.set_major_locator(MaxNLocator(integer=True, nbins=4))
+        axe.yaxis.set_major_locator(MaxNLocator(integer=True, nbins=4))
+
+        ticks_pos = axe.get_xticks()
+        axe.set_yticks(ticks_pos)
+        axe.set_xticks(ticks_pos)
+
+        axe.plot(axe.get_xlim(), axe.get_ylim(), '--k', clip_on=False, lw=1,
+                 zorder=1)
+
+    fig.subplots_adjust(
+        left=0.09, right=1-0.01, bottom=0.08, wspace=0.3, hspace=0.3,
+        top=0.89)
 
     plt.show()
 
@@ -89,14 +114,9 @@ def plot_cop():
 
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
+    plt.close('all')
 
-#    eval_model()
-#    plot_cop()
-#
-    w = HeatPump()
-#    w.setFixedSize(w.size())
-    w.setCurrentUnitSystem('SI')
-
-    w.set_Vftot({'cooling': 12.5/15.8503230745/1000,
-                 'heating': 12.5/15.8503230745/1000})
+    database = load_heatpump_database()
+    hpnames = list(database.keys())
+    for hpname in hpnames:
+        plot_fitmodel_eval_from(database[hpname])
