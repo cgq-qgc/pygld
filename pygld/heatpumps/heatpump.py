@@ -103,8 +103,9 @@ class HeatPump(object):
 
     @property
     def hpdata(self):
-        return self.hpDB[self.hpname]
         """Return the performance data table of the heat pump."""
+        return self._hpdb[self.hpname]
+
     @property
     def hpnames(self):
         """Return a list of all available heatpumps in the database."""
@@ -192,7 +193,7 @@ class HeatPump(object):
         # ewt: entering water temperature in the HP (ºC)
         # gpm: columetric flowrate in the HP (L/s)
 
-        A = self.hpDB[self.hpname]['models'][varname]
+        A = self._hpdb[self.hpname]['models'][varname]
 
         var = (A[0] +
                A[1]*ewt + A[2]*ewt**2 +
@@ -210,9 +211,9 @@ class HeatPump(object):
         return var*afcorr
 
     def in_table(self, varname, x1, y1):
-        x = self.hpDB[self.hpname]['EWT']
-        y = self.hpDB[self.hpname]['GPM']
-        z = self.hpDB[self.hpname][varname]
+        x = self._hpdb[self.hpname]['EWT']
+        y = self._hpdb[self.hpname]['GPM']
+        z = self._hpdb[self.hpname][varname]
 
         # remove nan values :
         indx = np.where(~np.isnan(z))[0]
@@ -227,8 +228,8 @@ class HeatPump(object):
         return bool(hull.find_simplex((x1, y1)) >= 0)
 
     def get_flowRange(self):
-        vmax = np.max(self.hpDB[self.hpname]['GPM']) * self.Nhp
-        vmin = np.min(self.hpDB[self.hpname]['GPM']) * self.Nhp
+        vmax = np.max(self._hpdb[self.hpname]['GPM']) * self.Nhp
+        vmin = np.min(self._hpdb[self.hpname]['GPM']) * self.Nhp
         return vmin, vmax
 
     def get_COP(self, mode):
