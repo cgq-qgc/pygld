@@ -19,18 +19,16 @@ import pytest
 
 from pygld.heatpumps.utils import build_database
 from pygld.utils.fileio import delete_file_safely
-from pygld import __rootdir__
-
-DBDIRNAME = osp.join(__rootdir__, 'heatpumps', 'data')
-DBFNAME = osp.join(DBDIRNAME, 'hp_database.npy')
+from pygld.heatpumps import __datadir__
 
 
 def test_build_database(qtbot):
     """
     Test that the database is building as expected.
     """
-    delete_file_safely(DBFNAME)
-    assert not osp.exists(DBFNAME)
+    expected_filename = osp.join(__datadir__, 'hp_database.npy')
+    delete_file_safely(expected_filename)
+    assert not osp.exists(expected_filename)
 
     # Assert that an error is raised if the provided directory name does not
     # exist.
@@ -40,9 +38,9 @@ def test_build_database(qtbot):
 
     # Build the database and assert that a file was created as expected.
 
-    filename = build_database(DBDIRNAME)
-    assert filename == DBFNAME
-    assert osp.exists(DBFNAME)
+    filename = build_database(__datadir__)
+    assert filename == expected_filename
+    assert osp.exists(expected_filename)
 
 
 if __name__ == "__main__":
