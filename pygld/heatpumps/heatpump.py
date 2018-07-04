@@ -259,8 +259,20 @@ class HeatPump(object):
 #    def get_WPD(self, mode):
 #        return self.interp('WPD', self.TinHP[mode], self.Vhp[mode])
 
+    # ---- Utility methods
+
+    def plot_heatpump_model_goodness(self):
+        """
+        Produce a graph that shows the goodness of fit of the equation-fit
+        models used to evaluate the COP and CAP values of the heatpump as a
+        function of the entering water temperature (EWT) and volumetric
+        flowrate.
+        """
+        plot_fitmodel_eval_from(self.hpdata)
+
 
 if __name__ == '__main__':
     heatpump = HeatPump()
+    heatpump.plot_heatpump_model_goodness()
     hpdb = heatpump._hpdb
     print(heatpump.hpnames)
