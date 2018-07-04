@@ -30,9 +30,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 """
 
-from pygld.fluidproperties import HeatCarrierFluid
-from pygld.heatpumps.heatpump import HeatPump
-
 import os
 import sys
 
@@ -60,3 +57,6 @@ if is_frozen():
     __rootdir__ = sys._MEIPASS
 else:
     __rootdir__ = os.path.dirname(os.path.realpath(__file__))
+
+from pygld.fluidproperties import HeatCarrierFluid
+from pygld.heatpumps.heatpump import HeatPump

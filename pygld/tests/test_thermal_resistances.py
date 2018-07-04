@@ -7,28 +7,24 @@
 # Licensed under the terms of the MIT License.
 
 
-# ---- Imports: standard libraries
+# ---- Standard imports
 
 import sys
 import os
-from itertools import product
 
-
-# ---- Imports: third parties
+# ---- Third party imports
 
 import numpy as np
 from numpy import pi
 import pytest
 
 
-# ---- Imports: local
+# ---- Local imports
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from pygld import calcul_Rb_multipoles
+from pygld.thermal_resistances import calcul_Rb_multipoles
 
 
-# Test calcul_Rb_multipoles
-# -------------------------------
+# ---- Test calcul_Rb_multipoles
 
 def test_multipole_with_claesson_2011():
     """
@@ -60,4 +56,3 @@ def test_multipole_with_claesson_2011():
 
 if __name__ == "__main__":
     pytest.main(['-x', os.path.basename(__file__), '-v', '-rw'])
-    # pytest.main()
