@@ -103,12 +103,14 @@ class HeatPump(object):
 
     @property
     def hpdata(self):
-        """Performance data table of the heat pump."""
         return self.hpDB[self.hpname]
+        """Return the performance data table of the heat pump."""
 
     @property
     def ToutHP(self):
-        """Temperature of the water leaving the heat pump in ºC."""
+        """
+        Return the temperature of the water leaving the heat pump (LWT) in ºC.
+        """
         ToutHP = {}
         for mode in ['cooling', 'heating']:
             ToutHP[mode] = self.calcul_ToutHP(mode)
@@ -117,7 +119,7 @@ class HeatPump(object):
 
     @property
     def Tm(self):
-        """Fluid mean temperature through the heat pump in ºC"""
+        """Return the fluid mean temperature through the heat pump in ºC"""
         ToutHP = self.ToutHP
         TinHP = self.TinHP
 
@@ -129,7 +131,7 @@ class HeatPump(object):
 
     @property
     def Vhp(self):
-        """Volumetric flowrate per HP in L/s"""
+        """Return the volumetric flowrate per HP in L/s"""
         return {'heating': self.Vftot['heating'] / self.Nhp,
                 'cooling': self.Vftot['cooling'] / self.Nhp}
 
@@ -141,7 +143,7 @@ class HeatPump(object):
 
         # Calculate fluid properties :
 
-        hcfluid = HCFluid(self.fluid, self.TinHP[mode], self.fr)
+        hcfluid = HeatCarrierFluid(self.fluid, self.TinHP[mode], self.fr)
         rhof = hcfluid.rho
         cpf = hcfluid.cp
 
@@ -233,15 +235,8 @@ class HeatPump(object):
 #    def get_WPD(self, mode):
 #        return self.interp('WPD', self.TinHP[mode], self.Vhp[mode])
 
+
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-#    eval_model()
-#    plot_cop()
-#
-    w = HeatPump()
-#    w.setFixedSize(w.size())
-    w.setCurrentUnitSystem('SI')
-
-    w.set_Vftot({'cooling': 12.5/15.8503230745/1000,
-                 'heating': 12.5/15.8503230745/1000})
+    heatpump = HeatPump()
+    hpdb = heatpump._hpdb
+    print(heatpump.hpnames)
