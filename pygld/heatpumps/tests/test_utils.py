@@ -22,7 +22,7 @@ from pygld.utils.fileio import delete_file_safely
 from pygld.heatpumps import __datadir__
 
 
-def test_build_database(qtbot):
+def test_build_database():
     """
     Test that the database is building as expected.
     """
