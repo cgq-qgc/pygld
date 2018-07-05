@@ -70,14 +70,12 @@ class HeatPump(object):
         fluid : heat carrier fluid type
         fr    : antifreeze volumetric fraction
         Vf    : fluid carrier volumetric flowrate in the heatpump in L/s
-        Tg    : undisturbed ground temperature in ºC
         """
         self._hpdb = load_heatpump_database()
         self.set_hpname(0)
 
         self.TinHP = {'cooling': 28, 'heating': 0}
         self.qbat = {'cooling': 16.5, 'heating': 14.5}
-        self.Tg = 12
         self.Vf = {'cooling': np.mean(self.get_flowRange()),
                    'heating': np.mean(self.get_flowRange())}
         self.fluid = 'water'
