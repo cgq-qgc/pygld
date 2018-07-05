@@ -164,9 +164,20 @@ class HeatPump(object):
     @property
     def CAP(self):
         """Return the capacity of the heatpump in kW."""
-        self._CAP._heating_val = self.interp('CAPh', self.TinHP.h, self.Vf.h)
-        self._CAP._cooling_val = self.interp('CAPc', self.TinHP.c, self.Vf.c)
+        if self._need_update[id(self._CAP)]:
+            self._CAP._heating = \
+                self.eval_fitmodel_for('CAPh', self.TinHP.h, self.Vf.h)
+            self._CAP._cooling = \
+                self.eval_fitmodel_for('CAPc', self.TinHP.c, self.Vf.c)
+            self._need_update[id(self._CAP)] = False
         return self._CAP
+
+    def _varstate_has_changed(self):
+        """
+        Reset the '_need_update' flags for all the dependent variables
+        when the value of an independent variable changes.
+        """
+        self._need_update = {id(p): True for p in self._dependent_props}
 
     # ---- Calculs
 
@@ -196,22 +207,20 @@ class HeatPump(object):
 
         return ToutHP
 
-    def interp(self, varname, ewt, gpm):
+    def eval_fitmodel_for(self, varname, ewt, vf):
         """
         Evaluate the heatpump <varname> at the specifived ewt and gpm value
         with the equation-fit model.
 
         varname : COPc, COPh, CAPc, CAPh
         ewt : entering water temperature in the HP (ºC)
-        gpm : volumetric flowrate in the HP (L/s)
+        vf : volumetric flowrate in the HP (L/s)
         """
+        # Get the equation-fit model coefficients and evaluate the values of
+        # varname for the provided independent variables pair of points.
 
-        A = self._hpdb[self.hpname]['models'][varname]
-
-        y = (A[0] +
-             A[1]*ewt + A[2]*ewt**2 +
-             A[3]*gpm + A[4]*gpm**2 +
-             A[5]*ewt*gpm)
+        A = self._hpdb[self.model]['eqfit_models'][varname]
+        y = eval_polyfid2rd(A, ewt, vf)
 
         # Get the anti-freeze correction factor.
 
