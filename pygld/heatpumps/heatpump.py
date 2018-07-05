@@ -19,6 +19,7 @@ from scipy.spatial import Delaunay
 
 from pygld.fluidproperties import HeatCarrierFluid
 from pygld.heatpumps.utils import load_heatpump_database
+from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
 
 corrtbl_afreeze = {}
@@ -78,20 +79,25 @@ class HeatPump(object):
 
         # Independent properties :
 
-        self.TinHP = IndependentProp(cooling=28, heating=0)
-        self.qbat = IndependentProp(cooling=16.5, heating=14.5)
+        self.TinHP = IndependentProp(self, cooling=28, heating=0)
+        self.qbat = IndependentProp(self, cooling=16.5, heating=14.5)
 
-        self.Vf = IndependentProp(
-            cooling=0.05 * self.qbat.cooling, heating=0.05 * self.qbat.heating)
+        self.Vf = IndependentProp(self,
+                                  cooling=0.05 * self.qbat.cooling,
+                                  heating=0.05 * self.qbat.heating)
         self.fluid = 'water'
         self.fr = 0
 
         # Dependent properties :
 
-        self._Tm = DependentProp()
-        self._ToutHP = DependentProp()
-        self._COP = DependentProp()
-        self._CAP = DependentProp()
+        self._Tm = DependentProp(self)
+        self._ToutHP = DependentProp(self)
+        self._COP = DependentProp(self)
+        self._CAP = DependentProp(self)
+
+        self._dependent_props = [self._Tm, self._ToutHP, self._COP, self._CAP]
+        self._need_update = {id(p): True for p in self._dependent_props}
+
     def __str__(self):
         str_ = "model = %s\n\n" % self.model
         str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
@@ -142,23 +148,30 @@ class HeatPump(object):
         """
         Return the temperature of the water leaving the heat pump (LWT) in ºC.
         """
-        self._ToutHP._heating_val = self.calcul_ToutHP('heating')
-        self._ToutHP._cooling_val = self.calcul_ToutHP('cooling')
+        if self._need_update[id(self._ToutHP)]:
+            self._ToutHP._heating = self.calcul_ToutHP_for_mode('heating')
+            self._ToutHP._cooling = self.calcul_ToutHP_for_mode('cooling')
+            self._need_update[id(self._ToutHP)] = False
         return self._ToutHP
 
     @property
     def Tm(self):
         """Return the fluid mean temperature through the heat pump in ºC"""
-        ToutHP, TinHP = self.ToutHP, self.TinHP
-        self._Tm._heating_val = (TinHP.h + ToutHP.h)/2
-        self._Tm._cooling_val = (TinHP.c + ToutHP.c)/2
+        if self._need_update[id(self._Tm)]:
+            self._Tm._heating = (self.TinHP.h + self.ToutHP.h)/2
+            self._Tm._cooling = (self.TinHP.c + self.ToutHP.c)/2
+            self._need_update[id(self._Tm)] = False
         return self._Tm
 
     @property
     def COP(self):
         """Return the coefficient of performance of the heatpump."""
-        self._COP._heating_val = self.interp('COPh', self.TinHP.h, self.Vf.h)
-        self._COP._cooling_val = self.interp('COPc', self.TinHP.c, self.Vf.c)
+        if self._need_update[id(self._COP)]:
+            self._COP._heating = \
+                self.eval_fitmodel_for('COPh', self.TinHP.h, self.Vf.h)
+            self._COP._cooling = \
+                self.eval_fitmodel_for('COPc', self.TinHP.c, self.Vf.c)
+            self._need_update[id(self._COP)]
         return self._COP
 
     @property
@@ -195,11 +208,10 @@ class HeatPump(object):
 
         # Calculate ground load :
 
-        COP = self.get_COP(mode)
         if mode == 'cooling':
-            qgnd = self.qbat[mode] * (COP + 1) / COP
+            qgnd = self.qbat[mode] * (self.COP[mode] + 1) / self.COP[mode]
         elif mode == 'heating':
-            qgnd = -self.qbat[mode] * (COP - 1) / COP
+            qgnd = -self.qbat[mode] * (self.COP[mode] - 1) / self.COP[mode]
 
         # Calculate outflow fluid temperature :
 
