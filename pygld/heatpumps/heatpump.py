@@ -236,28 +236,6 @@ class HeatPump(object):
         vmin = np.min(self._hpdb[self.hpname]['GPM'])
         return vmin, vmax
 
-    def get_COP(self, mode):
-        """
-        Return the coefficient of performance (COP) of the heat pump for the
-        specified mode of operation (cooling of heating).
-        """
-        if mode == 'cooling':
-            return self.interp('COPc', self.TinHP[mode], self.Vf[mode])
-        elif mode == 'heating':
-            return self.interp('COPh', self.TinHP[mode], self.Vf[mode])
-
-    def get_CAP(self, mode):
-        """
-        Return the capacity (CAP) of the heat pump in kW for the specified
-        mode of operation (cooling of heating).
-        """
-        if mode == 'cooling':
-            return self.interp('CAPc', self.TinHP[mode], self.Vf[mode])
-        elif mode == 'heating':
-            return self.interp('CAPh', self.TinHP[mode], self.Vf[mode])
-
-    # ---- Utility methods
-
     def plot_heatpump_model_goodness(self):
         """
         Produce a graph that shows the goodness of fit of the equation-fit
