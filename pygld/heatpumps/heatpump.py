@@ -8,9 +8,6 @@
 
 # ---- Standard imports
 
-import os
-import os.path as osp
-
 # ---- Third party imports
 
 import numpy as np
