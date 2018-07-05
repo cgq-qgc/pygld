@@ -285,6 +285,51 @@ class HeatPump(object):
             print('  CAP    : %0.2f kW' % self.CAP[mode])
 
 
+class HeatPumpProp(Mapping):
+    """A class that hold a property of the heatpump."""
+
+    COOLING_ATTRS = ['cooling', 'cool', 'c']
+    HEATING_ATTRS = ['heating', 'heat', 'h']
+
+    def __init__(self, cooling=None, heating=None):
+        super(HeatPumpProp, self).__init__()
+        self._cooling_val = cooling
+        self._heating_val = heating
+
+    def __getitem__(self, key):
+        """Returns the value saved in the store at key."""
+        return self.__getattr__(key)
+
+    def __getattr__(self, attr):
+        if attr in self.COOLING_ATTRS:
+            return self._cooling_val
+        elif attr in self.HEATING_ATTRS:
+            return self._heating_val
+        else:
+            return super().__getattr__(attr)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+
+    def __setattr__(self, attr, value):
+        if attr in self.COOLING_ATTRS:
+            self._cooling_val = value
+        elif attr.lower() in self.HEATING_ATTRS:
+            self._heating_val = value
+        else:
+            super().__setattr__(attr, value)
+
+    def __iter__(self):
+        for x in [self._cooling_val, self._heating_val]:
+            yield x
+
+    def __len__(self, key):
+        return 2
+
+    def __str__(self):
+        return "{'cooling': %f, 'heating': %f}" % (self.cooling, self.heating)
+
+
 if __name__ == '__main__':
     heatpump = HeatPump()
     heatpump.plot_heatpump_model_goodness()
