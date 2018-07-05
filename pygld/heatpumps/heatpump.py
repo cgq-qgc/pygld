@@ -300,13 +300,14 @@ class HeatPump(object):
 class DependentProp(Mapping):
     """A dependent property of the heatpump."""
 
-    COOLING_ATTRS = ['cooling', 'cool', 'c']
-    HEATING_ATTRS = ['heating', 'heat', 'h']
+    COOLING_ATTRS = ['cooling', 'c']
+    HEATING_ATTRS = ['heating', 'h']
 
-    def __init__(self, cooling=None, heating=None):
+    def __init__(self, parent, cooling=None, heating=None):
         super(DependentProp, self).__init__()
-        self._cooling_val = cooling
-        self._heating_val = heating
+        self._parent = parent
+        self._cooling = cooling
+        self._heating = heating
 
     def __getitem__(self, key):
         """Returns the value saved in the store at key."""
@@ -314,9 +315,9 @@ class DependentProp(Mapping):
 
     def __getattr__(self, attr):
         if attr in self.COOLING_ATTRS:
-            return self._cooling_val
+            return self._cooling
         elif attr in self.HEATING_ATTRS:
-            return self._heating_val
+            return self._heating
         else:
             return super().__getattr__(attr)
 
@@ -330,7 +331,7 @@ class DependentProp(Mapping):
             super().__setattr__(attr, value)
 
     def __iter__(self):
-        for x in [self._cooling_val, self._heating_val]:
+        for x in [self._cooling, self._heating]:
             yield x
 
     def __len__(self, key):
@@ -348,9 +349,11 @@ class IndependentProp(DependentProp):
 
     def __setattr__(self, attr, value):
         if attr in self.COOLING_ATTRS:
-            self._cooling_val = value
-        elif attr.lower() in self.HEATING_ATTRS:
-            self._heating_val = value
+            self._cooling = value
+            self._parent._varstate_has_changed()
+        elif attr in self.HEATING_ATTRS:
+            self._heating = value
+            self._parent._varstate_has_changed()
         else:
             super().__setattr__(attr, value)
 
