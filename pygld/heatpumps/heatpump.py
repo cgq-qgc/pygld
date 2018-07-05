@@ -157,6 +157,22 @@ class HeatPump(object):
         return {'heating': self.Vftot['heating'] / self.Nhp,
                 'cooling': self.Vftot['cooling'] / self.Nhp}
 
+    @property
+    def COP(self):
+        """Return the coefficient of performance of the heatpump."""
+        coph = self.interp('COPh', self.TinHP['heating'], self.Vhp['heating'])
+        copc = self.interp('COPc', self.TinHP['cooling'], self.Vhp['cooling'])
+        return {'heating': coph, 'cooling': copc}
+
+    @property
+    def CAP(self):
+        """Return the capacity of the heatpump in kW."""
+        caph = self.interp('CAPh', self.TinHP['heating'], self.Vhp['heating'])
+        capc = self.interp('CAPc', self.TinHP['cooling'], self.Vhp['cooling'])
+        return {'heating': caph, 'cooling': capc}
+
+    # ---- Calculs
+
     def calcul_ToutHP(self, mode):
         """
         Calcul the temperature of the fluid leaving the heat pump for the
