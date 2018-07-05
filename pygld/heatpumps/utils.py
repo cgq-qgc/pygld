@@ -119,16 +119,16 @@ def load_heatpump_table_fromfile(filename):
     # water-to-water heat pumps for use in energy calculation programs.
     # ASHRAE Transactions: Research, 108(1): 3-17
 
-    data['models'] = {}
+    data['eqfit_models'] = {}
 
     x1 = data['EWT']
     x2 = data['GPM']
 
-    data['models']['CAPc'] = multi_polyfit2rd(data['CAPc'], x1, x2)
-    data['models']['CAPh'] = multi_polyfit2rd(data['CAPh'], x1, x2)
+    data['eqfit_models']['CAPc'] = multi_polyfit2rd(data['CAPc'], x1, x2)
+    data['eqfit_models']['CAPh'] = multi_polyfit2rd(data['CAPh'], x1, x2)
 
-    data['models']['COPc'] = multi_polyfit2rd(data['COPc'], x1, x2)
-    data['models']['COPh'] = multi_polyfit2rd(data['COPh'], x1, x2)
+    data['eqfit_models']['COPc'] = multi_polyfit2rd(data['COPc'], x1, x2)
+    data['eqfit_models']['COPh'] = multi_polyfit2rd(data['COPh'], x1, x2)
 
     return data
 

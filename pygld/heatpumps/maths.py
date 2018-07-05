@@ -46,5 +46,8 @@ def eval_polyfid2rd(A, x1, x2):
     Use the list of coefficients A to compute values of the dependent variable
     from arrays of values of the independent variables x1 and x2.
     """
-    X = np.hstack([np.ones(len(x1)), x1, x1**2, x2, x2**2, x1*x2])
+    try:
+        X = np.hstack([np.ones(len(x1)), x1, x1**2, x2, x2**2, x1*x2])
+    except TypeError:
+        X = np.array([1, x1, x1**2, x2, x2**2, x1*x2])
     return np.dot(A, X)
