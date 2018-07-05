@@ -92,6 +92,22 @@ class HeatPump(object):
         self._ToutHP = DependentProp()
         self._COP = DependentProp()
         self._CAP = DependentProp()
+    def __str__(self):
+        str_ = "model = %s\n\n" % self.model
+        str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
+        str_ += "qbat (%s): %0.2f kW\n" % ('cooling', self.qbat.c)
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('heating', self.Vf.h)
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('cooling', self.Vf.c)
+        str_ += 'fluid  : %s\n' % self.fluid
+        str_ += 'fr     : %s\n' % self.fr
+        for mode in ['heating', 'cooling']:
+            str_ += '\n'
+            str_ += 'TinHP  (%s): %0.2f \u00B0C\n' % (mode, self.TinHP[mode])
+            str_ += 'ToutHP (%s): %0.2f \u00B0C\n' % (mode, self.ToutHP[mode])
+            str_ += 'Tm     (%s): %0.2f \u00B0C\n' % (mode, self.Tm[mode])
+            str_ += 'COP    (%s): %0.2f\n' % (mode, self.COP[mode])
+            str_ += 'CAP    (%s): %0.2f kW\n' % (mode, self.CAP[mode])
+        return str_
 
     @property
     def hpdata(self):
@@ -256,23 +272,6 @@ class HeatPump(object):
         for i, hpname in enumerate(self.hpnames):
             indent = ' ' * (max_indent - i//100)
             print("%s%d - %s" % (indent, i, hpname))
-
-    def __str__(self):
-        str_ = "model = %s\n\n" % self.hpname
-        str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
-        str_ += "qbat (%s): %0.2f kW\n" % ('cooling', self.qbat.c)
-        str_ += 'Vf (%s): %0.2f L/s\n' % ('heating', self.Vf.h)
-        str_ += 'Vf (%s): %0.2f L/s\n' % ('cooling', self.Vf.c)
-        str_ += 'fluid  : %s\n' % self.fluid
-        str_ += 'fr     : %s\n' % self.fr
-        for mode in ['heating', 'cool']:
-            str_ += '\n'
-            str_ += 'TinHP  (%s): %0.2f \u00B0C\n' % (mode, self.TinHP[mode])
-            str_ += 'ToutHP (%s): %0.2f \u00B0C\n' % (mode, self.ToutHP[mode])
-            str_ += 'Tm     (%s): %0.2f \u00B0C\n' % (mode, self.Tm[mode])
-            str_ += 'COP    (%s): %0.2f\n' % (mode, self.COP[mode])
-            str_ += 'CAP    (%s): %0.2f kW\n' % (mode, self.CAP[mode])
-        return str_
 
 
 class DependentProp(Mapping):
