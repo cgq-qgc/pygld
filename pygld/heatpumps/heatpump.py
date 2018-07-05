@@ -81,16 +81,18 @@ class HeatPump(object):
                 applied to the heatpump.
         fluid : heat carrier fluid type
         fr    : antifreeze volumetric fraction
-        Vhp   : fluid carrier volumetric flowrate in the heatpump in L/s
+        Vf    : fluid carrier volumetric flowrate in the heatpump in L/s
         Tg    : undisturbed ground temperature in ºC
         """
 
         self._hpdb = load_heatpump_database()
 
         self.qbat = {'cooling': 16.5, 'heating': 14.5}
+        self.Tg = 12
+
+        self.Vf = {'cooling': 0.05 * 16.5, 'heating': 0.05 * 14.5}
         self.fluid = 'water'
         self.fr = 0
-        self.Tg = 12
 
     @property
     def hpdata(self):
@@ -168,7 +170,7 @@ class HeatPump(object):
 
         # Calculate outflow fluid temperature :
 
-        ToutHP = self.TinHP[mode] + qgnd/(self.Vhp[mode]*rhof*cpf) * 10**6
+        ToutHP = self.TinHP[mode] + qgnd/(self.Vf[mode]*rhof*cpf) * 10**6
 
         return ToutHP
 
@@ -229,9 +231,9 @@ class HeatPump(object):
         specified mode of operation (cooling of heating).
         """
         if mode == 'cooling':
-            return self.interp('COPc', self.TinHP[mode], self.Vhp[mode])
+            return self.interp('COPc', self.TinHP[mode], self.Vf[mode])
         elif mode == 'heating':
-            return self.interp('COPh', self.TinHP[mode], self.Vhp[mode])
+            return self.interp('COPh', self.TinHP[mode], self.Vf[mode])
 
     def get_CAP(self, mode):
         """
@@ -239,9 +241,9 @@ class HeatPump(object):
         mode of operation (cooling of heating).
         """
         if mode == 'cooling':
-            return self.interp('CAPc', self.TinHP[mode], self.Vhp[mode])
+            return self.interp('CAPc', self.TinHP[mode], self.Vf[mode])
         elif mode == 'heating':
-            return self.interp('CAPh', self.TinHP[mode], self.Vhp[mode])
+            return self.interp('CAPh', self.TinHP[mode], self.Vf[mode])
 
     # ---- Utility methods
 
