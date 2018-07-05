@@ -7,28 +7,23 @@
 # Licensed under the terms of the MIT License.
 
 
-# ---- Imports: standard libraries
+# ---- Standard imports
 
 import sys
 import os
-from itertools import product
 
 
-# ---- Imports: third parties
+# ---- Third party imports
 
 import numpy as np
 from numpy import nan
 import pytest
 
 
-# ---- Imports: local
+# ---- Local imports
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from pygld import HeatCarrierFluid
+from pygld.fluidproperties import HeatCarrierFluid
 
-
-# Test RawDataDownloader
-# -------------------------------
 
 def test_antifreeze_and_fluid_error():
     """Test that error are raised correctly for Tref and fr."""

@@ -1,0 +1,32 @@
+Manufacturer,ClimateMaster,,,,,,
+Model,"TMW840 (70 tons, 246 kW)",,,,,,
+Nominal CAP (tons),70,,,,,,
+Note,Data at SEWT of 80F and 210 GPM for heating and 70F and 210 GM for cooling,,,,,,
+EWT (F),Vflow (GPM),WPDc (psi),CAPc (kBtuh),Wc (kW),WPDh (psi),CAPh (kBtuh),Wh (kW)
+30,105,nan,nan,nan,2.5,671.6,43.9
+30,158,nan,nan,nan,5.5,689,44.1
+30,210,nan,nan,nan,9.6,697.4,44.2
+40,105,nan,nan,nan,2.5,779.9,45
+40,158,nan,nan,nan,5.5,805.1,45.3
+40,210,nan,nan,nan,9.6,817.2,45.4
+50,105,nan,nan,nan,2.5,898.9,46.3
+50,158,nan,nan,nan,5.5,934.3,46.7
+50,210,nan,nan,nan,9.6,951.4,46.9
+60,105,2.8,1138.5,47.3,2.5,1027.7,47.8
+60,158,6,1174.2,44.9,5.5,1076.1,48.4
+60,210,nan,nan,nan,9.6,1099.7,48.8
+70,105,nan,nan,nan,2.5,1165.3,49.6
+70,158,nan,nan,nan,5.5,1229.9,50.6
+70,210,nan,nan,nan,9.6,1261.6,51
+75,105,2.8,1059.2,53.4,nan,nan,nan
+75,158,6,1096.3,50.4,nan,nan,nan
+75,210,10.4,1115,48.9,nan,nan,nan
+90,105,2.8,975.2,61.2,nan,nan,nan
+90,158,6,1011.5,57.5,nan,nan,nan
+90,210,10.4,1031.4,55.8,nan,nan,nan
+105,105,2.8,876.1,70.7,nan,nan,nan
+105,158,6,918.4,66.5,nan,nan,nan
+105,210,10.4,939.8,64.4,nan,nan,nan
+120,105,2.8,767.8,82.3,nan,nan,nan
+120,158,6,811.9,77.5,nan,nan,nan
+120,210,10.4,834,75.1,nan,nan,nan
