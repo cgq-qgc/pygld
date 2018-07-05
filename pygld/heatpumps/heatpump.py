@@ -66,7 +66,7 @@ class HeatPump(object):
     def __init__(self):
         """
         TinHP  : temperature of the fluid entering the HP in ºC.
-        hpname : name of the heat pump
+        model : model of the heat pump
         qbat  : building thermal load in kW (+ for cooling, - for heating)
                 applied to the heatpump.
         fluid : heat carrier fluid type
@@ -74,7 +74,7 @@ class HeatPump(object):
         Vf    : fluid carrier volumetric flowrate in the heatpump in L/s
         """
         self._hpdb = load_heatpump_database()
-        self.set_hpname(0)
+        self.set_model(0)
 
         # Independent properties :
 
@@ -112,25 +112,20 @@ class HeatPump(object):
     @property
     def hpdata(self):
         """Return the performance data table of the heat pump."""
-        return self._hpdb[self.hpname]
+        return self._hpdb[self.model]
 
     @property
-    def hpnames(self):
-        """Return a list of all available heatpumps in the database."""
-        return list(self._hpdb.keys())
-
-    @property
-    def hpname(self):
+    def model(self):
         """Return the name of the current heat pump."""
-        return self._hpname
+        return self._model
 
-    def set_hpname(self, value):
+    def set_model(self, value):
         """
         Set the name of the heatpump either from an index or a key. If the
         index or key is not found in the database, an error is raised.
         """
         if isinstance(value, int):
-            self._hpname = self.hpnames[value]
+            self._model = self.get_avail_heatpump_models()[value]
         elif isinstance(value, str):
             if value in list(self._hpdb.keys()):
                 self._name = value
@@ -140,7 +135,7 @@ class HeatPump(object):
         else:
             raise TypeError("'value' must be either an int or a str")
 
-    # ---- Dependent variables
+    # ---- Dependent properties
 
     @property
     def ToutHP(self):
@@ -175,7 +170,7 @@ class HeatPump(object):
 
     # ---- Calculs
 
-    def calcul_ToutHP(self, mode):
+    def calcul_ToutHP_for_mode(self, mode):
         """
         Calcul the temperature of the fluid leaving the heat pump for the
         current mode of operation (cooling of heating).
@@ -226,6 +221,8 @@ class HeatPump(object):
 
         return y * afcorr
 
+    # ---- Utility methods
+
     def in_table(self, varname, p1, p2):
         """
         Check whether the (p1, p2) point is inside or outside the data table
@@ -235,11 +232,11 @@ class HeatPump(object):
         Based on this stackoverflow answer:
         http://stackoverflow.com/a/16898636/4481445
         """
-        y = self._hpdb[self.hpname][varname]
+        y = self._hpdb[self.model][varname]
         indx = np.where(~np.isnan(y))[0]
 
-        x1 = self._hpdb[self.hpname]['EWT'][indx]
-        x2 = self._hpdb[self.hpname]['GPM'][indx]
+        x1 = self._hpdb[self.model]['EWT'][indx]
+        x2 = self._hpdb[self.model]['GPM'][indx]
 
         hull = Delaunay(np.vstack((x1, x2)).T)
         return bool(hull.find_simplex((p1, p2)) >= 0)
@@ -248,8 +245,8 @@ class HeatPump(object):
         """
         Return the minimum and maximum operational flowrate of the heatpump.
         """
-        vmax = np.max(self._hpdb[self.hpname]['GPM'])
-        vmin = np.min(self._hpdb[self.hpname]['GPM'])
+        vmax = np.max(self._hpdb[self.model]['GPM'])
+        vmin = np.min(self._hpdb[self.model]['GPM'])
         return vmin, vmax
 
     def plot_heatpump_model_goodness(self):
