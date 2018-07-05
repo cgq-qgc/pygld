@@ -273,16 +273,6 @@ class HeatPump(object):
             indent = ' ' * (max_indent - i//100)
             print("%s%d - %s" % (indent, i, hpname))
 
-    def print_indepent_variables(self):
-        for mode in ['heating', 'cooling']:
-            print('\nIndependent variables for the %s mode :' % mode)
-            print('  ToutHP : %0.2f ºC' % self.ToutHP[mode])
-            print('  Tm     : %0.2f ºC' % self.Tm[mode])
-            print('  Vhp    : %0.2f L/s' % self.Vhp[mode])
-            print('  COP    : %0.2f ºC' % self.COP[mode])
-            print('  CAP    : %0.2f kW' % self.CAP[mode])
-
-
     def __str__(self):
         str_ = "model = %s\n\n" % self.hpname
         str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
