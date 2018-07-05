@@ -64,19 +64,7 @@ class HeatPump(object):
     def __init__(self):
         """
         TinHP  : temperature of the fluid entering the HP in ºC.
-        Nhp    : number of heat pump
         hpname : name of the heat pump
-        """
-
-        self.__initAttr__()
-
-        self.TinHP = {'cooling': 28, 'heating': 0}
-        self.set_hpname(0)
-
-    def __initAttr__(self):
-        """
-        Initialize the attributes that are not to be linked with the UI
-
         qbat  : building thermal load in kW (+ for cooling, - for heating)
                 applied to the heatpump.
         fluid : heat carrier fluid type
@@ -84,13 +72,14 @@ class HeatPump(object):
         Vf    : fluid carrier volumetric flowrate in the heatpump in L/s
         Tg    : undisturbed ground temperature in ºC
         """
-
         self._hpdb = load_heatpump_database()
+        self.set_hpname(0)
 
+        self.TinHP = {'cooling': 28, 'heating': 0}
         self.qbat = {'cooling': 16.5, 'heating': 14.5}
         self.Tg = 12
-
-        self.Vf = {'cooling': 0.05 * 16.5, 'heating': 0.05 * 14.5}
+        self.Vf = {'cooling': np.mean(self.get_flowRange()),
+                   'heating': np.mean(self.get_flowRange())}
         self.fluid = 'water'
         self.fr = 0
 
