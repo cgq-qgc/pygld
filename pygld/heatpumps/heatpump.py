@@ -8,6 +8,8 @@
 
 # ---- Standard imports
 
+from collections.abc import Mapping
+
 # ---- Third party imports
 
 import numpy as np
@@ -74,12 +76,22 @@ class HeatPump(object):
         self._hpdb = load_heatpump_database()
         self.set_hpname(0)
 
-        self.TinHP = {'cooling': 28, 'heating': 0}
-        self.qbat = {'cooling': 16.5, 'heating': 14.5}
-        self.Vf = {'cooling': np.mean(self.get_flowRange()),
-                   'heating': np.mean(self.get_flowRange())}
+        # Independent properties :
+
+        self.TinHP = IndependentProp(cooling=28, heating=0)
+        self.qbat = IndependentProp(cooling=16.5, heating=14.5)
+
+        self.Vf = IndependentProp(
+            cooling=0.05 * self.qbat.cooling, heating=0.05 * self.qbat.heating)
         self.fluid = 'water'
         self.fr = 0
+
+        # Dependent properties :
+
+        self._Tm = DependentProp()
+        self._ToutHP = DependentProp()
+        self._COP = DependentProp()
+        self._CAP = DependentProp()
 
     @property
     def hpdata(self):
@@ -119,37 +131,31 @@ class HeatPump(object):
         """
         Return the temperature of the water leaving the heat pump (LWT) in ºC.
         """
-        ToutHP = {}
-        for mode in ['cooling', 'heating']:
-            ToutHP[mode] = self.calcul_ToutHP(mode)
-
-        return ToutHP
+        self._ToutHP._heating_val = self.calcul_ToutHP('heating')
+        self._ToutHP._cooling_val = self.calcul_ToutHP('cooling')
+        return self._ToutHP
 
     @property
     def Tm(self):
         """Return the fluid mean temperature through the heat pump in ºC"""
-        ToutHP = self.ToutHP
-        TinHP = self.TinHP
-
-        Tm = {}
-        for mode in ['cooling', 'heating']:
-            Tm[mode] = (TinHP[mode] + ToutHP[mode])/2
-
-        return Tm
+        ToutHP, TinHP = self.ToutHP, self.TinHP
+        self._Tm._heating_val = (TinHP.h + ToutHP.h)/2
+        self._Tm._cooling_val = (TinHP.c + ToutHP.c)/2
+        return self._Tm
 
     @property
     def COP(self):
         """Return the coefficient of performance of the heatpump."""
-        coph = self.interp('COPh', self.TinHP['heating'], self.Vf['heating'])
-        copc = self.interp('COPc', self.TinHP['cooling'], self.Vf['cooling'])
-        return {'heating': coph, 'cooling': copc}
+        self._COP._heating_val = self.interp('COPh', self.TinHP.h, self.Vf.h)
+        self._COP._cooling_val = self.interp('COPc', self.TinHP.c, self.Vf.c)
+        return self._COP
 
     @property
     def CAP(self):
         """Return the capacity of the heatpump in kW."""
-        caph = self.interp('CAPh', self.TinHP['heating'], self.Vf['heating'])
-        capc = self.interp('CAPc', self.TinHP['cooling'], self.Vf['cooling'])
-        return {'heating': caph, 'cooling': capc}
+        self._CAP._heating_val = self.interp('CAPh', self.TinHP.h, self.Vf.h)
+        self._CAP._cooling_val = self.interp('CAPc', self.TinHP.c, self.Vf.c)
+        return self._CAP
 
     # ---- Calculs
 
