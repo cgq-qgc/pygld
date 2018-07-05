@@ -128,6 +128,8 @@ class HeatPump(object):
         else:
             raise TypeError("'value' must be either an int or a str")
 
+    # ---- Dependent variables
+
     @property
     def ToutHP(self):
         """
