@@ -283,6 +283,27 @@ class HeatPump(object):
         """
         plot_fitmodel_eval_from(self.hpdata)
 
+    def print_avail_heatpumps(self):
+        """
+        Print a list of the available heatpump model names
+        in the database.
+        """
+        N = len(self.hpnames)
+        max_indent = (N-1)//10
+        print("There is %d heatpumps in the database :" % len(self.hpnames))
+        for i, hpname in enumerate(self.hpnames):
+            indent = ' ' * (max_indent - i//100)
+            print("%s%d - %s" % (indent, i, hpname))
+
+    def print_indepent_variables(self):
+        for mode in ['heating', 'cooling']:
+            print('\nIndependent variables for the %s mode :' % mode)
+            print('  ToutHP : %0.2f ºC' % self.ToutHP[mode])
+            print('  Tm     : %0.2f ºC' % self.Tm[mode])
+            print('  Vhp    : %0.2f L/s' % self.Vhp[mode])
+            print('  COP    : %0.2f ºC' % self.COP[mode])
+            print('  CAP    : %0.2f kW' % self.CAP[mode])
+
 
 if __name__ == '__main__':
     heatpump = HeatPump()
