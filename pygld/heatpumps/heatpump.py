@@ -118,7 +118,7 @@ class HeatPump(object):
         index or key is not found in the database, an error is raised.
         """
         if isinstance(value, int):
-            self._hpname = self.hpnames[0]
+            self._hpname = self.hpnames[value]
         elif isinstance(value, str):
             if value in list(self._hpdb.keys()):
                 self._name = value
