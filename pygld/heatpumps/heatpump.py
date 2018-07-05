@@ -283,14 +283,32 @@ class HeatPump(object):
             print('  CAP    : %0.2f kW' % self.CAP[mode])
 
 
-class HeatPumpProp(Mapping):
-    """A class that hold a property of the heatpump."""
+    def __str__(self):
+        str_ = "model = %s\n\n" % self.hpname
+        str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
+        str_ += "qbat (%s): %0.2f kW\n" % ('cooling', self.qbat.c)
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('heating', self.Vf.h)
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('cooling', self.Vf.c)
+        str_ += 'fluid  : %s\n' % self.fluid
+        str_ += 'fr     : %s\n' % self.fr
+        for mode in ['heating', 'cool']:
+            str_ += '\n'
+            str_ += 'TinHP  (%s): %0.2f \u00B0C\n' % (mode, self.TinHP[mode])
+            str_ += 'ToutHP (%s): %0.2f \u00B0C\n' % (mode, self.ToutHP[mode])
+            str_ += 'Tm     (%s): %0.2f \u00B0C\n' % (mode, self.Tm[mode])
+            str_ += 'COP    (%s): %0.2f\n' % (mode, self.COP[mode])
+            str_ += 'CAP    (%s): %0.2f kW\n' % (mode, self.CAP[mode])
+        return str_
+
+
+class DependentProp(Mapping):
+    """A dependent property of the heatpump."""
 
     COOLING_ATTRS = ['cooling', 'cool', 'c']
     HEATING_ATTRS = ['heating', 'heat', 'h']
 
     def __init__(self, cooling=None, heating=None):
-        super(HeatPumpProp, self).__init__()
+        super(DependentProp, self).__init__()
         self._cooling_val = cooling
         self._heating_val = heating
 
@@ -310,10 +328,8 @@ class HeatPumpProp(Mapping):
         self.__setattr__(key, value)
 
     def __setattr__(self, attr, value):
-        if attr in self.COOLING_ATTRS:
-            self._cooling_val = value
-        elif attr.lower() in self.HEATING_ATTRS:
-            self._heating_val = value
+        if attr in self.COOLING_ATTRS + self.HEATING_ATTRS:
+            raise AttributeError('Cannot set attribute %s' % attr)
         else:
             super().__setattr__(attr, value)
 
@@ -326,6 +342,21 @@ class HeatPumpProp(Mapping):
 
     def __str__(self):
         return "{'cooling': %f, 'heating': %f}" % (self.cooling, self.heating)
+
+
+class IndependentProp(DependentProp):
+    """An independent property of the heatpump."""
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+
+    def __setattr__(self, attr, value):
+        if attr in self.COOLING_ATTRS:
+            self._cooling_val = value
+        elif attr.lower() in self.HEATING_ATTRS:
+            self._heating_val = value
+        else:
+            super().__setattr__(attr, value)
 
 
 if __name__ == '__main__':
