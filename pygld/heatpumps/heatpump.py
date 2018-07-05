@@ -261,17 +261,18 @@ class HeatPump(object):
         """
         plot_fitmodel_eval_from(self.hpdata)
 
-    def print_avail_heatpumps(self):
-        """
-        Print a list of the available heatpump model names
-        in the database.
-        """
-        N = len(self.hpnames)
+    def get_avail_heatpump_models(self):
+        """Return a list of all available heatpump models in the database."""
+        return list(self._hpdb.keys())
+
+    def print_avail_heatpump_models(self):
+        """Print the list of the available heatpump models in the database."""
+        models = self.get_avail_heatpump_models()
+        N = len(models)
         max_indent = (N-1)//10
-        print("There is %d heatpumps in the database :" % len(self.hpnames))
-        for i, hpname in enumerate(self.hpnames):
+        for i, model in enumerate(models):
             indent = ' ' * (max_indent - i//100)
-            print("%s%d - %s" % (indent, i, hpname))
+            print("%s%d - %s" % (indent, i, model))
 
 
 class DependentProp(Mapping):
