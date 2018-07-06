@@ -336,7 +336,10 @@ class DependentProp(Mapping):
         elif attr in self.HEATING_ATTRS:
             return self._heating
         else:
-            return super().__getattr__(attr)
+            try:
+                return super().__getattr__(attr)
+            except AttributeError:
+                raise AttributeError(attr)
 
     def __setitem__(self, key, value):
         self.__setattr__(key, value)
