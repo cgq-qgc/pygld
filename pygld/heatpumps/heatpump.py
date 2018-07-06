@@ -8,6 +8,8 @@
 
 # ---- Standard imports
 
+from collections.abc import Mapping
+
 # ---- Third party imports
 
 import numpy as np
@@ -17,9 +19,8 @@ from scipy.spatial import Delaunay
 
 from pygld.fluidproperties import HeatCarrierFluid
 from pygld.heatpumps.utils import load_heatpump_database
+from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
-
-corrtbl_afreeze = {}
 
 tbl_fluid0 = {}
 tbl_fluid0['name'] = 'water'
@@ -54,6 +55,7 @@ tbl_fluid2['COPh'] = tbl_fluid1['CAPh']/tbl_fluid1['Wh']
 tbl_fluid2['COPc'] = tbl_fluid1['CAPc']/tbl_fluid1['Wc']
 tbl_fluid2['WPD'] = [1, 1.040, 1.120, 1.200]
 
+corrtbl_afreeze = {}
 corrtbl_afreeze[tbl_fluid0['name']] = tbl_fluid0
 corrtbl_afreeze[tbl_fluid1['name']] = tbl_fluid1
 corrtbl_afreeze[tbl_fluid2['name']] = tbl_fluid2
@@ -64,47 +66,73 @@ class HeatPump(object):
     def __init__(self):
         """
         TinHP  : temperature of the fluid entering the HP in ºC.
-        hpname : name of the heat pump
+        model : model of the heat pump
         qbat  : building thermal load in kW (+ for cooling, - for heating)
                 applied to the heatpump.
         fluid : heat carrier fluid type
         fr    : antifreeze volumetric fraction
         Vf    : fluid carrier volumetric flowrate in the heatpump in L/s
-        Tg    : undisturbed ground temperature in ºC
         """
         self._hpdb = load_heatpump_database()
-        self.set_hpname(0)
+        self.set_model(0)
 
-        self.TinHP = {'cooling': 28, 'heating': 0}
-        self.qbat = {'cooling': 16.5, 'heating': 14.5}
-        self.Tg = 12
-        self.Vf = {'cooling': np.mean(self.get_flowRange()),
-                   'heating': np.mean(self.get_flowRange())}
+        # Independent properties :
+
+        self._TinHP = IndependentProp(self, cooling=28, heating=0)
+        self.qbat = IndependentProp(self, cooling=16.5, heating=14.5)
+
+        self.Vf = IndependentProp(self, cooling=0.94635295, heating=0.94635295)
         self.fluid = 'water'
         self.fr = 0
+
+        # Dependent properties :
+
+        self._Tm = DependentProp(self)
+        self._ToutHP = DependentProp(self)
+        self._COP = DependentProp(self)
+        self._CAP = DependentProp(self)
+
+        self._dependent_props = [self._Tm, self._ToutHP, self._COP, self._CAP]
+        self._need_update = {id(p): True for p in self._dependent_props}
+
+    def __str__(self):
+        str_ = "model: %s\n" % self.model
+        str_ += "-" * 25 + "\n"
+        str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
+        str_ += "qbat (%s): %0.2f kW\n" % ('cooling', self.qbat.c)
+        str_ += "-" * 25 + "\n"
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('heating', self.Vf.h)
+        str_ += 'Vf (%s): %0.2f L/s\n' % ('cooling', self.Vf.c)
+        str_ += 'fluid: %s\n' % self.fluid
+        str_ += 'fr   : %s\n' % self.fr
+        for mode in ['heating', 'cooling']:
+            str_ += "-" * 25 + "\n"
+            str_ += 'TinHP  (%s): %0.2f \u00B0C\n' % (mode, self.TinHP[mode])
+            str_ += 'ToutHP (%s): %0.2f \u00B0C\n' % (mode, self.ToutHP[mode])
+            str_ += 'Tm     (%s): %0.2f \u00B0C\n' % (mode, self.Tm[mode])
+            str_ += 'COP    (%s): %0.2f\n' % (mode, self.COP[mode])
+            str_ += 'CAP    (%s): %0.2f kW\n' % (mode, self.CAP[mode])
+        return str_
+
+    # ---- Model and data
 
     @property
     def hpdata(self):
         """Return the performance data table of the heat pump."""
-        return self._hpdb[self.hpname]
+        return self._hpdb[self.model]
 
     @property
-    def hpnames(self):
-        """Return a list of all available heatpumps in the database."""
-        return list(self._hpdb.keys())
-
-    @property
-    def hpname(self):
+    def model(self):
         """Return the name of the current heat pump."""
-        return self._hpname
+        return self._model
 
-    def set_hpname(self, value):
+    def set_model(self, value):
         """
         Set the name of the heatpump either from an index or a key. If the
         index or key is not found in the database, an error is raised.
         """
         if isinstance(value, int):
-            self._hpname = self.hpnames[0]
+            self._model = self.get_avail_heatpump_models()[value]
         elif isinstance(value, str):
             if value in list(self._hpdb.keys()):
                 self._name = value
@@ -114,33 +142,84 @@ class HeatPump(object):
         else:
             raise TypeError("'value' must be either an int or a str")
 
+    # ---- Independent properties
+
+    @property
+    def TinHP(self):
+        """
+        Temperature of the water entering the heat pump (EWT) in ºC.
+        """
+        return self._TinHP
+
+    @TinHP.setter
+    def TinHP(self, values):
+        """
+        Set the maximum cooling and minimum heating temperature of the water
+        entering the heat pump (EWT) in ºC from a tuple of floats, where the
+        first value is for the cooling mode and second for the heating mode.
+        """
+        self._TinHP.c = values[0]
+        self._TinHP.h = values[1]
+
+    # ---- Dependent properties
+
     @property
     def ToutHP(self):
         """
-        Return the temperature of the water leaving the heat pump (LWT) in ºC.
+        Temperature of the water leaving the heat pump (LWT) in ºC.
         """
-        ToutHP = {}
-        for mode in ['cooling', 'heating']:
-            ToutHP[mode] = self.calcul_ToutHP(mode)
-
-        return ToutHP
+        if self._need_update[id(self._ToutHP)]:
+            self._ToutHP._heating = self.calcul_ToutHP_for_mode('heating')
+            self._ToutHP._cooling = self.calcul_ToutHP_for_mode('cooling')
+            self._need_update[id(self._ToutHP)] = False
+        return self._ToutHP
 
     @property
     def Tm(self):
-        """Return the fluid mean temperature through the heat pump in ºC"""
-        ToutHP = self.ToutHP
-        TinHP = self.TinHP
+        """
+        Mean temperature of the water circulating through the heat pump in ºC
+        """
+        if self._need_update[id(self._Tm)]:
+            self._Tm._heating = (self.TinHP.h + self.ToutHP.h)/2
+            self._Tm._cooling = (self.TinHP.c + self.ToutHP.c)/2
+            self._need_update[id(self._Tm)] = False
+        return self._Tm
 
-        Tm = {}
-        for mode in ['cooling', 'heating']:
-            Tm[mode] = (TinHP[mode] + ToutHP[mode])/2
+    @property
+    def COP(self):
+        """Coefficient of performance of the heatpump."""
+        if self._need_update[id(self._COP)]:
+            self._COP._heating = \
+                self.eval_fitmodel_for('COPh', self.TinHP.h, self.Vf.h)
+            self._COP._cooling = \
+                self.eval_fitmodel_for('COPc', self.TinHP.c, self.Vf.c)
+            self._need_update[id(self._COP)] = False
+        return self._COP
 
-        return Tm
+    @property
+    def CAP(self):
+        """Capacity of the heatpump in kW."""
+        if self._need_update[id(self._CAP)]:
+            self._CAP._heating = \
+                self.eval_fitmodel_for('CAPh', self.TinHP.h, self.Vf.h)
+            self._CAP._cooling = \
+                self.eval_fitmodel_for('CAPc', self.TinHP.c, self.Vf.c)
+            self._need_update[id(self._CAP)] = False
+        return self._CAP
 
-    def calcul_ToutHP(self, mode):
+    def _varstate_has_changed(self):
+        """
+        Reset the '_need_update' flags for all the dependent variables
+        when the value of an independent variable changes.
+        """
+        self._need_update = {id(p): True for p in self._dependent_props}
+
+    # ---- Calculs
+
+    def calcul_ToutHP_for_mode(self, mode):
         """
         Calcul the temperature of the fluid leaving the heat pump for the
-        current mode of operation (cooling of heating).
+        current mode of operation (cooling or heating).
         """
 
         # Calculate fluid properties :
@@ -151,11 +230,10 @@ class HeatPump(object):
 
         # Calculate ground load :
 
-        COP = self.get_COP(mode)
         if mode == 'cooling':
-            qgnd = self.qbat[mode] * (COP + 1) / COP
+            qgnd = self.qbat[mode] * (self.COP[mode] + 1) / self.COP[mode]
         elif mode == 'heating':
-            qgnd = -self.qbat[mode] * (COP - 1) / COP
+            qgnd = -self.qbat[mode] * (self.COP[mode] - 1) / self.COP[mode]
 
         # Calculate outflow fluid temperature :
 
@@ -163,22 +241,20 @@ class HeatPump(object):
 
         return ToutHP
 
-    def interp(self, varname, ewt, gpm):
+    def eval_fitmodel_for(self, varname, ewt, vf):
         """
-        Evaluate the heatpump <varname> at the specifived ewt and gpm value
+        Evaluate the heatpump COP or CAP at the specified ewt and vf value
         with the equation-fit model.
 
         varname : COPc, COPh, CAPc, CAPh
         ewt : entering water temperature in the HP (ºC)
-        gpm : volumetric flowrate in the HP (L/s)
+        vf : volumetric flowrate in the HP (L/s)
         """
+        # Get the equation-fit model coefficients and evaluate the values of
+        # varname for the provided independent variables pair of points.
 
-        A = self._hpdb[self.hpname]['models'][varname]
-
-        y = (A[0] +
-             A[1]*ewt + A[2]*ewt**2 +
-             A[3]*gpm + A[4]*gpm**2 +
-             A[5]*ewt*gpm)
+        A = self._hpdb[self.model]['eqfit_models'][varname]
+        y = eval_polyfid2rd(A, ewt, vf)
 
         # Get the anti-freeze correction factor.
 
@@ -187,6 +263,8 @@ class HeatPump(object):
                            corrtbl_afreeze[self.fluid][varname])
 
         return y * afcorr
+
+    # ---- Utility methods
 
     def in_table(self, varname, p1, p2):
         """
@@ -197,11 +275,11 @@ class HeatPump(object):
         Based on this stackoverflow answer:
         http://stackoverflow.com/a/16898636/4481445
         """
-        y = self._hpdb[self.hpname][varname]
+        y = self._hpdb[self.model][varname]
         indx = np.where(~np.isnan(y))[0]
 
-        x1 = self._hpdb[self.hpname]['EWT'][indx]
-        x2 = self._hpdb[self.hpname]['GPM'][indx]
+        x1 = self._hpdb[self.model]['EWT'][indx]
+        x2 = self._hpdb[self.model]['GPM'][indx]
 
         hull = Delaunay(np.vstack((x1, x2)).T)
         return bool(hull.find_simplex((p1, p2)) >= 0)
@@ -210,31 +288,9 @@ class HeatPump(object):
         """
         Return the minimum and maximum operational flowrate of the heatpump.
         """
-        vmax = np.max(self._hpdb[self.hpname]['GPM'])
-        vmin = np.min(self._hpdb[self.hpname]['GPM'])
+        vmax = np.max(self._hpdb[self.model]['GPM'])
+        vmin = np.min(self._hpdb[self.model]['GPM'])
         return vmin, vmax
-
-    def get_COP(self, mode):
-        """
-        Return the coefficient of performance (COP) of the heat pump for the
-        specified mode of operation (cooling of heating).
-        """
-        if mode == 'cooling':
-            return self.interp('COPc', self.TinHP[mode], self.Vf[mode])
-        elif mode == 'heating':
-            return self.interp('COPh', self.TinHP[mode], self.Vf[mode])
-
-    def get_CAP(self, mode):
-        """
-        Return the capacity (CAP) of the heat pump in kW for the specified
-        mode of operation (cooling of heating).
-        """
-        if mode == 'cooling':
-            return self.interp('CAPc', self.TinHP[mode], self.Vf[mode])
-        elif mode == 'heating':
-            return self.interp('CAPh', self.TinHP[mode], self.Vf[mode])
-
-    # ---- Utility methods
 
     def plot_heatpump_model_goodness(self):
         """
@@ -245,9 +301,85 @@ class HeatPump(object):
         """
         plot_fitmodel_eval_from(self.hpdata)
 
+    def get_avail_heatpump_models(self):
+        """Return a list of all available heatpump models in the database."""
+        return list(self._hpdb.keys())
+
+    def print_avail_heatpump_models(self):
+        """Print the list of the available heatpump models in the database."""
+        models = self.get_avail_heatpump_models()
+        N = len(models)
+        max_indent = (N-1)//10
+        for i, model in enumerate(models):
+            indent = ' ' * (max_indent - i//100)
+            print("%s%d - %s" % (indent, i, model))
+
+
+class DependentProp(Mapping):
+    """A dependent property of the heatpump."""
+
+    COOLING_ATTRS = ['cooling', 'c', 0]
+    HEATING_ATTRS = ['heating', 'h', 1]
+
+    def __init__(self, parent, cooling=None, heating=None):
+        super(DependentProp, self).__init__()
+        self._parent = parent
+        self._cooling = cooling
+        self._heating = heating
+
+    def __getitem__(self, key):
+        return self.__getattr__(key)
+
+    def __getattr__(self, attr):
+        if attr in self.COOLING_ATTRS:
+            return self._cooling
+        elif attr in self.HEATING_ATTRS:
+            return self._heating
+        else:
+            try:
+                return super().__getattr__(attr)
+            except AttributeError:
+                raise AttributeError(attr)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+
+    def __setattr__(self, attr, value):
+        if attr in self.COOLING_ATTRS + self.HEATING_ATTRS:
+            raise AttributeError('Cannot set attribute %s' % attr)
+        else:
+            super().__setattr__(attr, value)
+
+    def __iter__(self):
+        for x in [self._cooling, self._heating]:
+            yield x
+
+    def __len__(self, key):
+        return 2
+
+    def __str__(self):
+        return "{'cooling': %f, 'heating': %f}" % (self.cooling, self.heating)
+
+
+class IndependentProp(DependentProp):
+    """An independent property of the heatpump."""
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+
+    def __setattr__(self, attr, value):
+        if attr in self.COOLING_ATTRS:
+            self._cooling = value
+            self._parent._varstate_has_changed()
+        elif attr in self.HEATING_ATTRS:
+            self._heating = value
+            self._parent._varstate_has_changed()
+        else:
+            super().__setattr__(attr, value)
+
 
 if __name__ == '__main__':
     heatpump = HeatPump()
+    print(heatpump)
     heatpump.plot_heatpump_model_goodness()
-    hpdb = heatpump._hpdb
-    print(heatpump.hpnames)
+    heatpump.print_avail_heatpump_models()

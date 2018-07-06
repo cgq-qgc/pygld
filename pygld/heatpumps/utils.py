@@ -20,6 +20,7 @@ import numpy as np
 # ---- Local imports
 
 from pygld.heatpumps import __datadir__
+from pygld.heatpumps.maths import multi_polyfit2rd
 
 
 def load_heatpump_database(dirname=None):
@@ -118,44 +119,18 @@ def load_heatpump_table_fromfile(filename):
     # water-to-water heat pumps for use in energy calculation programs.
     # ASHRAE Transactions: Research, 108(1): 3-17
 
-    data['models'] = {}
+    data['eqfit_models'] = {}
 
     x1 = data['EWT']
     x2 = data['GPM']
 
-    data['models']['CAPc'] = multi_polyfit2rd(data['CAPc'], x1, x2)
-    data['models']['CAPh'] = multi_polyfit2rd(data['CAPh'], x1, x2)
+    data['eqfit_models']['CAPc'] = multi_polyfit2rd(data['CAPc'], x1, x2)
+    data['eqfit_models']['CAPh'] = multi_polyfit2rd(data['CAPh'], x1, x2)
 
-    data['models']['COPc'] = multi_polyfit2rd(data['COPc'], x1, x2)
-    data['models']['COPh'] = multi_polyfit2rd(data['COPh'], x1, x2)
+    data['eqfit_models']['COPc'] = multi_polyfit2rd(data['COPc'], x1, x2)
+    data['eqfit_models']['COPh'] = multi_polyfit2rd(data['COPh'], x1, x2)
 
     return data
-
-
-def multi_polyfit2rd(y, x1, x2):
-    """
-    Calculate the coefficient of a second order polynomial expression in two
-    variables of the form :
-
-    y = a1 + a2*x1 + a3*x1^2 + a4*x2, a5*x2^2 + a6*x1*x2
-
-    where y is the dependent variable, x1 and x2 are the independent variables,
-    and ai are the coefficients of the model.
-    """
-
-    # Remove nan values in the dataset.
-
-    indx = np.where(~np.isnan(y))[0]
-    y = y[indx]
-    x1 = x1[indx]
-    x2 = x2[indx]
-
-    # Organize the data in the form : Ax = y
-
-    x = np.column_stack([np.ones(len(y)), x1, x1**2, x2, x2**2, x1*x2])
-    A = np.linalg.lstsq(x, y)[0]
-
-    return A
 
 
 if __name__ == '__main__':
