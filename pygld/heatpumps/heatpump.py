@@ -193,7 +193,7 @@ class HeatPump(object):
                 self.eval_fitmodel_for('COPh', self.TinHP.h, self.Vf.h)
             self._COP._cooling = \
                 self.eval_fitmodel_for('COPc', self.TinHP.c, self.Vf.c)
-            self._need_update[id(self._COP)]
+            self._need_update[id(self._COP)] = False
         return self._COP
 
     @property
