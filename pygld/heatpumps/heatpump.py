@@ -78,12 +78,10 @@ class HeatPump(object):
 
         # Independent properties :
 
-        self.TinHP = IndependentProp(self, cooling=28, heating=0)
+        self._TinHP = IndependentProp(self, cooling=28, heating=0)
         self.qbat = IndependentProp(self, cooling=16.5, heating=14.5)
 
-        self.Vf = IndependentProp(self,
-                                  cooling=0.05 * self.qbat.cooling,
-                                  heating=0.05 * self.qbat.heating)
+        self.Vf = IndependentProp(self, cooling=0.94635295, heating=0.94635295)
         self.fluid = 'water'
         self.fr = 0
 
@@ -143,6 +141,25 @@ class HeatPump(object):
                                  % value)
         else:
             raise TypeError("'value' must be either an int or a str")
+
+    # ---- Independent properties
+
+    @property
+    def TinHP(self):
+        """
+        Temperature of the water entering the heat pump (EWT) in ºC.
+        """
+        return self._TinHP
+
+    @TinHP.setter
+    def TinHP(self, values):
+        """
+        Set the maximum cooling and minimum heating temperature of the water
+        entering the heat pump (EWT) in ºC from a tuple of floats, where the
+        first value is for the cooling mode and second for the heating mode.
+        """
+        self._TinHP.c = values[0]
+        self._TinHP.h = values[1]
 
     # ---- Dependent properties
 
