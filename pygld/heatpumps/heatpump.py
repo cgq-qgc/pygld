@@ -99,15 +99,17 @@ class HeatPump(object):
         self._need_update = {id(p): True for p in self._dependent_props}
 
     def __str__(self):
-        str_ = "model = %s\n\n" % self.model
+        str_ = "model: %s\n" % self.model
+        str_ += "-" * 25 + "\n"
         str_ += "qbat (%s): %0.2f kW\n" % ('heating', self.qbat.h)
         str_ += "qbat (%s): %0.2f kW\n" % ('cooling', self.qbat.c)
+        str_ += "-" * 25 + "\n"
         str_ += 'Vf (%s): %0.2f L/s\n' % ('heating', self.Vf.h)
         str_ += 'Vf (%s): %0.2f L/s\n' % ('cooling', self.Vf.c)
-        str_ += 'fluid  : %s\n' % self.fluid
-        str_ += 'fr     : %s\n' % self.fr
+        str_ += 'fluid: %s\n' % self.fluid
+        str_ += 'fr   : %s\n' % self.fr
         for mode in ['heating', 'cooling']:
-            str_ += '\n'
+            str_ += "-" * 25 + "\n"
             str_ += 'TinHP  (%s): %0.2f \u00B0C\n' % (mode, self.TinHP[mode])
             str_ += 'ToutHP (%s): %0.2f \u00B0C\n' % (mode, self.ToutHP[mode])
             str_ += 'Tm     (%s): %0.2f \u00B0C\n' % (mode, self.Tm[mode])
@@ -306,7 +308,6 @@ class DependentProp(Mapping):
         self._heating = heating
 
     def __getitem__(self, key):
-        """Returns the value saved in the store at key."""
         return self.__getattr__(key)
 
     def __getattr__(self, attr):
@@ -356,6 +357,6 @@ class IndependentProp(DependentProp):
 
 if __name__ == '__main__':
     heatpump = HeatPump()
+    print(heatpump)
     heatpump.plot_heatpump_model_goodness()
-    hpdb = heatpump._hpdb
-    print(heatpump.hpnames)
+    heatpump.print_avail_heatpump_models()
