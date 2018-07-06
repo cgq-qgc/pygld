@@ -22,8 +22,6 @@ from pygld.heatpumps.utils import load_heatpump_database
 from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
 
-corrtbl_afreeze = {}
-
 tbl_fluid0 = {}
 tbl_fluid0['name'] = 'water'
 tbl_fluid0['fr'] = [0]
@@ -57,6 +55,7 @@ tbl_fluid2['COPh'] = tbl_fluid1['CAPh']/tbl_fluid1['Wh']
 tbl_fluid2['COPc'] = tbl_fluid1['CAPc']/tbl_fluid1['Wc']
 tbl_fluid2['WPD'] = [1, 1.040, 1.120, 1.200]
 
+corrtbl_afreeze = {}
 corrtbl_afreeze[tbl_fluid0['name']] = tbl_fluid0
 corrtbl_afreeze[tbl_fluid1['name']] = tbl_fluid1
 corrtbl_afreeze[tbl_fluid2['name']] = tbl_fluid2
