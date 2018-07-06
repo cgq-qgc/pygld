@@ -117,6 +117,8 @@ class HeatPump(object):
             str_ += 'CAP    (%s): %0.2f kW\n' % (mode, self.CAP[mode])
         return str_
 
+    # ---- Model and data
+
     @property
     def hpdata(self):
         """Return the performance data table of the heat pump."""
