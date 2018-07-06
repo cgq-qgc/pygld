@@ -166,7 +166,7 @@ class HeatPump(object):
     @property
     def ToutHP(self):
         """
-        Return the temperature of the water leaving the heat pump (LWT) in ºC.
+        Temperature of the water leaving the heat pump (LWT) in ºC.
         """
         if self._need_update[id(self._ToutHP)]:
             self._ToutHP._heating = self.calcul_ToutHP_for_mode('heating')
@@ -176,7 +176,9 @@ class HeatPump(object):
 
     @property
     def Tm(self):
-        """Return the fluid mean temperature through the heat pump in ºC"""
+        """
+        Mean temperature of the water circulating through the heat pump in ºC
+        """
         if self._need_update[id(self._Tm)]:
             self._Tm._heating = (self.TinHP.h + self.ToutHP.h)/2
             self._Tm._cooling = (self.TinHP.c + self.ToutHP.c)/2
@@ -185,7 +187,7 @@ class HeatPump(object):
 
     @property
     def COP(self):
-        """Return the coefficient of performance of the heatpump."""
+        """Coefficient of performance of the heatpump."""
         if self._need_update[id(self._COP)]:
             self._COP._heating = \
                 self.eval_fitmodel_for('COPh', self.TinHP.h, self.Vf.h)
@@ -196,7 +198,7 @@ class HeatPump(object):
 
     @property
     def CAP(self):
-        """Return the capacity of the heatpump in kW."""
+        """Capacity of the heatpump in kW."""
         if self._need_update[id(self._CAP)]:
             self._CAP._heating = \
                 self.eval_fitmodel_for('CAPh', self.TinHP.h, self.Vf.h)
