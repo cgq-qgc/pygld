@@ -47,7 +47,7 @@ def eval_polyfid2rd(A, x1, x2):
     from arrays of values of the independent variables x1 and x2.
     """
     try:
-        X = np.hstack([np.ones(len(x1)), x1, x1**2, x2, x2**2, x1*x2])
+        X = np.vstack([np.ones(len(x1)), x1, x1**2, x2, x2**2, x1*x2])
     except TypeError:
         X = np.array([1, x1, x1**2, x2, x2**2, x1*x2])
     return np.dot(A, X)

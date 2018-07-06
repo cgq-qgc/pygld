@@ -17,6 +17,7 @@ from matplotlib.ticker import MaxNLocator
 # ---- Local imports
 
 from pygld.heatpumps.utils import load_heatpump_database
+from pygld.heatpumps.maths import eval_polyfid2rd
 
 
 def plot_fitmodel_eval_from(hpdata):
@@ -37,26 +38,16 @@ def plot_fitmodel_eval_from(hpdata):
     iterables = zip(varnames, axes.flatten(), colors)
     for i, (varname, axe, color) in enumerate(iterables):
         y = hpdata[varname]
-
-        # Remove the nan values from the dataset and assign x1 and x2 data.
-
         indx = np.where(~np.isnan(y))[0]
-        y = y[indx]
-        x1 = hpdata['EWT'][indx]
-        x2 = hpdata['GPM'][indx]
 
         # Predict the heatpumps COP or CAP
 
-        A = hpdata['models'][varname]
-        yp = (A[0] +
-              A[1]*x1 + A[2]*x1**2 +
-              A[3]*x2 + A[4]*x2**2 +
-              A[5]*x1*x2
-              )
+        A = hpdata['eqfit_models'][varname]
+        yp = eval_polyfid2rd(A, hpdata['EWT'][indx], hpdata['GPM'][indx])
 
         # Plot the comparison between the predicted and measured data.
 
-        axe.plot(y, yp, 'o', ms=3, color=color, clip_on=False, zorder=10)
+        axe.plot(y[indx], yp, 'o', ms=3, color=color, clip_on=False, zorder=10)
         axe.set_xlabel('measured %s' % varname)
         axe.set_ylabel('predicted %s' % varname)
 
