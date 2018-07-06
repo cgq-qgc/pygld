@@ -219,7 +219,7 @@ class HeatPump(object):
     def calcul_ToutHP_for_mode(self, mode):
         """
         Calcul the temperature of the fluid leaving the heat pump for the
-        current mode of operation (cooling of heating).
+        current mode of operation (cooling or heating).
         """
 
         # Calculate fluid properties :
@@ -243,7 +243,7 @@ class HeatPump(object):
 
     def eval_fitmodel_for(self, varname, ewt, vf):
         """
-        Evaluate the heatpump <varname> at the specifived ewt and gpm value
+        Evaluate the heatpump COP or CAP at the specified ewt and vf value
         with the equation-fit model.
 
         varname : COPc, COPh, CAPc, CAPh
@@ -318,8 +318,8 @@ class HeatPump(object):
 class DependentProp(Mapping):
     """A dependent property of the heatpump."""
 
-    COOLING_ATTRS = ['cooling', 'c']
-    HEATING_ATTRS = ['heating', 'h']
+    COOLING_ATTRS = ['cooling', 'c', 0]
+    HEATING_ATTRS = ['heating', 'h', 1]
 
     def __init__(self, parent, cooling=None, heating=None):
         super(DependentProp, self).__init__()
