@@ -78,10 +78,35 @@ def test_lenght_notequal_error():
     match perfectly.
     """
     heatpump = HeatPump()
-    heatpump.TinHP = [28, 3, 16]
+    heatpump.TinHP = 28
+
     with pytest.raises(ValueError):
         print(heatpump.ToutHP)
 
+    heatpump.TinHP = [28, 0]
+    heatpump.qbat = [-16.5, 14.5, 12]
+    with pytest.raises(ValueError):
+        print(heatpump.ToutHP)
+
+
+def test_single_value():
+    """
+    Test that everything is working as expected when working with
+    single values
+    """
+    heatpump = HeatPump()
+    heatpump.TinHP = 28
+    heatpump.Vf = 0.94635295
+    heatpump.qbat = -16.5
+
+    assert np.round(heatpump.ToutHP, 6) == 33.273623
+    assert np.round(heatpump.COP, 6) == 3.849727
+    assert np.round(heatpump.CAP, 6) == 20.926771
+    assert np.round(heatpump.Tm, 6) == 30.636812
+
+
+def test_public_interface_insulation():
+    pass
 
 if __name__ == "__main__":
     pytest.main(['-x', os.path.basename(__file__), '-v', '-rw'])

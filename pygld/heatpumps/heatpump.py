@@ -129,8 +129,8 @@ class HeatPump(object):
         return copy.copy(self._hcfluid.fluid)
 
     @fluid.setter
-    def fluid(self, value):
-        self._hcfluid.fluid = value
+    def fluid(self, x):
+        self._hcfluid.fluid = x
         self._varstate_has_changed()
 
     @property
@@ -139,8 +139,8 @@ class HeatPump(object):
         return copy.copy(self._hcfluid.fr)
 
     @fr.setter
-    def fr(self, value):
-        self._hcfluid.fr = value
+    def fr(self, x):
+        self._hcfluid.fr = x
         self._varstate_has_changed()
 
     @property
@@ -151,10 +151,10 @@ class HeatPump(object):
         return np.copy(self._TinHP)
 
     @TinHP.setter
-    def TinHP(self, values):
-        values = values if isinstance(values, np.ndarray) else np.array(values)
-        self._TinHP = values
-        self._hcfluid.Tref = values
+    def TinHP(self, x):
+        x = np.array([x]) if not hasattr(x, '__iter__') else np.array(x)
+        self._TinHP = x.astype(float)
+        self._hcfluid.Tref = x
         self._varstate_has_changed()
 
     @property
@@ -166,9 +166,9 @@ class HeatPump(object):
         return np.copy(self._qbat)
 
     @qbat.setter
-    def qbat(self, values):
-        values = values if isinstance(values, np.ndarray) else np.array(values)
-        self._qbat = values
+    def qbat(self, x):
+        x = np.array([x]) if not hasattr(x, '__iter__') else np.array(x)
+        self._qbat = x.astype(float)
         self._varstate_has_changed()
 
     @property
@@ -179,9 +179,9 @@ class HeatPump(object):
         return np.copy(self._Vf)
 
     @Vf.setter
-    def Vf(self, values):
-        values = values if isinstance(values, np.ndarray) else np.array(values)
-        self._Vf = values
+    def Vf(self, x):
+        x = np.array([x]) if not hasattr(x, '__iter__') else np.array(x)
+        self._Vf = x.astype(float)
         self._varstate_has_changed()
 
     def _varstate_has_changed(self):
@@ -198,36 +198,24 @@ class HeatPump(object):
         """
         Temperature of the water leaving the heatpump (LWT) in ºC.
         """
-        if self._need_update['ToutHP']:
-            self._ToutHP = self.calcul_ToutHP()
-            self._need_update['ToutHP'] = False
-        return np.copy(self._ToutHP)
+        return np.copy(self.calcul_ToutHP())
 
     @property
     def Tm(self):
         """
         Mean temperature of the water circulating through the heatpump in ºC
         """
-        if self._need_update['Tm']:
-            self._Tm = self.calcul_Tm()
-            self._need_update['Tm'] = False
-        return np.copy(self._Tm)
+        return np.copy(self.calcul_Tm())
 
     @property
     def COP(self):
         """Coefficient of performance of the heatpump."""
-        if self._need_update['COP']:
-            self._COP = self.calcul_COP()
-            self._need_update['COP'] = False
-        return np.copy(self._COP)
+        return np.copy(self.calcul_COP())
 
     @property
     def CAP(self):
         """Capacity of the heatpump in kW."""
-        if self._need_update['CAP']:
-            self._CAP = self.calcul_CAP()
-            self._need_update['CAP'] = False
-        return np.copy(self._CAP)
+        return np.copy(self.calcul_CAP())
 
     # ---- Calculs
 
@@ -236,73 +224,77 @@ class HeatPump(object):
         Calcul the average temperature of the fluid circulating through the
         heatpump in ºC for every TinHP values.
         """
-        return (self.TinHP + self.ToutHP)/2
+        if self._need_update['Tm']:
+            ToutHP = self.calcul_ToutHP()
+            self._Tm = (self._TinHP + ToutHP)/2
+            self._need_update['Tm'] = False
+        return self._Tm
 
     def calcul_ToutHP(self):
         """
         Calcul the temperature of the fluid leaving the heatpump in ºC for
         every TinHP values.
         """
-        TinHP, Vf, qbat = self.TinHP, self.Vf, self.qbat
-        COP = self.COP
+        if self._need_update['ToutHP']:
+            # Get the fluid properties.
 
-        if len(TinHP) != len(Vf) != len(qbat):
-            raise ValueError("The lenght of TinHP, Vf, and qbat must match"
-                             " exactly.")
+            rhof, cpf = self._hcfluid.rho, self._hcfluid.cp
 
-        # Get the fluid properties.
+            # Calcul the ground loads.
 
-        rhof, cpf = self._hcfluid.rho, self._hcfluid.cp
+            self.calcul_COP()
+            qgnd = self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
 
-        # Calcul the ground loads.
+            # qbat is - for cooling and + for heating
+            # qgnd = qbat * (COP + 1)/COP in cooling mode
+            # qgnd = qbat * (COP - 1)/COP in heating mode
 
-        qgnd = qbat * (COP - np.sign(qbat)) / COP
+            # Calculate outflow fluid temperature.
 
-        # qbat is - for cooling and + for heating
-        # qgnd = qbat * (COP + 1)/COP in cooling mode
-        # qgnd = qbat * (COP - 1)/COP in heating mode
-
-        # Calculate outflow fluid temperature.
-
-        ToutHP = TinHP - qgnd/(Vf*rhof*cpf) * 10**6
-
-        return ToutHP
+            self._ToutHP = self._TinHP - qgnd/(self._Vf*rhof*cpf) * 10**6
+            self._need_update['ToutHP'] = False
+        return self._ToutHP
 
     def calcul_COP(self):
         """
         Calcul the coefficient of performance of the heatpump for each pair
         of TinHP and Vf values.
         """
-        return self._calcul_cop_or_cap('COP')
+        if self._need_update['COP']:
+            self._COP = self._calcul_cop_or_cap('COP')
+            self._need_update['COP'] = False
+        return self._COP
 
     def calcul_CAP(self):
         """
         Calcul the capacity of the heatpump in kW for each pair of TinHP and
         Vf values.
         """
-        return self._calcul_cop_or_cap('CAP')
+        if self._need_update['CAP']:
+            self._CAP = self._calcul_cop_or_cap('CAP')
+            self._need_update['CAP'] = False
+        return self._CAP
 
     def _calcul_cop_or_cap(self, varname):
         """Calcul the CAP or COP for each pair of TinHP and Vf values."""
-        TinHP, Vf, qbat = self.TinHP, self.Vf, self.qbat
-
-        if len(TinHP) != len(Vf) != len(qbat):
+        if not (len(self._TinHP) == len(self._Vf) == len(self._qbat)):
             raise ValueError("The lenght of TinHP, Vf, and qbat must match"
                              " exactly.")
 
-        ndarray = np.empty(len(TinHP))
+        ndarray = np.empty(len(self._TinHP))
 
         # Calcul values when cooling.
 
-        indx = np.where(qbat < 0)[0]
+        indx = np.where(self._qbat < 0)[0]
         ndarray[indx] = self.eval_fitmodel_for(
-            varname + 'c', TinHP[indx], Vf[indx])
+            varname + 'c', self._TinHP[indx], self._Vf[indx])
 
         # Calcul values when heating.
 
-        indx = np.where(qbat >= 0)[0]
+        indx = np.where(self._qbat >= 0)[0]
+        print(self._qbat, indx)
         ndarray[indx] = self.eval_fitmodel_for(
-            varname + 'h', TinHP[indx], Vf[indx])
+            varname + 'h', self._TinHP[indx], self._Vf[indx])
 
         return ndarray
 
