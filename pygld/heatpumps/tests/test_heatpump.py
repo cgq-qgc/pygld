@@ -72,5 +72,16 @@ def test_heatpump_need_update_flags():
         assert value is True
 
 
+def test_lenght_notequal_error():
+    """
+    Test that an error is raised when TinHP, qtbat, and Vf length does not
+    match perfectly.
+    """
+    heatpump = HeatPump()
+    heatpump.TinHP = [28, 3, 16]
+    with pytest.raises(ValueError):
+        print(heatpump.ToutHP)
+
+
 if __name__ == "__main__":
     pytest.main(['-x', os.path.basename(__file__), '-v', '-rw'])
