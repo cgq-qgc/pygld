@@ -242,7 +242,7 @@ class HeatPump(object):
 
             # Calcul the ground loads.
 
-            self.calcul_COP()
+            self._calcul_COP()
             qgnd = self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
 
             # qbat is - for cooling and + for heating
