@@ -97,12 +97,12 @@ class HeatPump(object):
 
     @property
     def hpdata(self):
-        """Return the performance data table of the heatpump."""
+        """Performance data of the heatpump."""
         return self._hpdb[self.model]
 
     @property
     def model(self):
-        """Return the name of the current heatpump."""
+        """Model of the heatpump."""
         return self._model
 
     def set_model(self, value):
@@ -135,7 +135,7 @@ class HeatPump(object):
 
     @property
     def fr(self):
-        """Volumetric fraction of antifreeze of the heat carrier fluid."""
+        """Volumetric fraction of antifreeze in the heat carrier fluid."""
         return copy.copy(self._hcfluid.fr)
 
     @fr.setter
@@ -146,7 +146,7 @@ class HeatPump(object):
     @property
     def TinHP(self):
         """
-        Temperature of the water entering the heatpump (EWT) in ºC.
+        Temperature of the water entering the heatpump in ºC.
         """
         return np.copy(self._TinHP)
 
@@ -174,7 +174,7 @@ class HeatPump(object):
     @property
     def Vf(self):
         """
-        Volumetric flowrate of the fluid carrier through the heatpump in L/s
+        Volumetric flowrate of the fluid through the heatpump in L/s
         """
         return np.copy(self._Vf)
 
@@ -184,6 +184,34 @@ class HeatPump(object):
         self._Vf = x.astype(float)
         self._varstate_has_changed()
 
+    # ---- Dependent properties
+
+    @property
+    def ToutHP(self):
+        """
+        Temperature of the water leaving the heatpump in ºC.
+        """
+        return np.copy(self._calcul_ToutHP())
+
+    @property
+    def Tm(self):
+        """
+        Mean temperature of the water circulating through the heatpump in ºC
+        """
+        return np.copy(self._calcul_Tm())
+
+    @property
+    def COP(self):
+        """Coefficient of performance of the heatpump."""
+        return np.copy(self._calcul_COP())
+
+    @property
+    def CAP(self):
+        """Capacity of the heatpump in kW."""
+        return np.copy(self._calcul_CAP())
+
+    # ---- Calculs
+
     def _varstate_has_changed(self):
         """
         Reset the '_need_update' flags for all the dependent variables
@@ -191,46 +219,18 @@ class HeatPump(object):
         """
         self._need_update = {p: True for p in self._dependent_props}
 
-    # ---- Dependent properties
-
-    @property
-    def ToutHP(self):
-        """
-        Temperature of the water leaving the heatpump (LWT) in ºC.
-        """
-        return np.copy(self.calcul_ToutHP())
-
-    @property
-    def Tm(self):
-        """
-        Mean temperature of the water circulating through the heatpump in ºC
-        """
-        return np.copy(self.calcul_Tm())
-
-    @property
-    def COP(self):
-        """Coefficient of performance of the heatpump."""
-        return np.copy(self.calcul_COP())
-
-    @property
-    def CAP(self):
-        """Capacity of the heatpump in kW."""
-        return np.copy(self.calcul_CAP())
-
-    # ---- Calculs
-
-    def calcul_Tm(self):
+    def _calcul_Tm(self):
         """
         Calcul the average temperature of the fluid circulating through the
         heatpump in ºC for every TinHP values.
         """
         if self._need_update['Tm']:
-            ToutHP = self.calcul_ToutHP()
+            ToutHP = self._calcul_ToutHP()
             self._Tm = (self._TinHP + ToutHP)/2
             self._need_update['Tm'] = False
         return self._Tm
 
-    def calcul_ToutHP(self):
+    def _calcul_ToutHP(self):
         """
         Calcul the temperature of the fluid leaving the heatpump in ºC for
         every TinHP values.
@@ -255,7 +255,7 @@ class HeatPump(object):
             self._need_update['ToutHP'] = False
         return self._ToutHP
 
-    def calcul_COP(self):
+    def _calcul_COP(self):
         """
         Calcul the coefficient of performance of the heatpump for each pair
         of TinHP and Vf values.
@@ -265,7 +265,7 @@ class HeatPump(object):
             self._need_update['COP'] = False
         return self._COP
 
-    def calcul_CAP(self):
+    def _calcul_CAP(self):
         """
         Calcul the capacity of the heatpump in kW for each pair of TinHP and
         Vf values.
@@ -286,19 +286,19 @@ class HeatPump(object):
         # Calcul values when cooling.
 
         indx = np.where(self._qbat < 0)[0]
-        ndarray[indx] = self.eval_fitmodel_for(
+        ndarray[indx] = self._eval_fitmodel_for(
             varname + 'c', self._TinHP[indx], self._Vf[indx])
 
         # Calcul values when heating.
 
         indx = np.where(self._qbat >= 0)[0]
         print(self._qbat, indx)
-        ndarray[indx] = self.eval_fitmodel_for(
+        ndarray[indx] = self._eval_fitmodel_for(
             varname + 'h', self._TinHP[indx], self._Vf[indx])
 
         return ndarray
 
-    def eval_fitmodel_for(self, varname, ewt, vf):
+    def _eval_fitmodel_for(self, varname, ewt, vf):
         """
         Evaluate the heatpump COP or CAP at the specified ewt and vf value
         with the equation-fit model.
