@@ -69,10 +69,12 @@ class HeatPump(object):
     """
 
     def __init__(self):
-        self._hpdb = load_heatpump_database()
-        self.set_model(0)
+        # Setup the update dependent properties flag :
 
-        # Independent properties :
+        self._dependent_props = ['Tm', 'ToutHP', 'COP', 'CAP']
+        self._varstate_has_changed()
+
+        # Setup the independent properties :
 
         self._TinHP = np.array([28, 0])
         self._qbat = np.array([-16.5, 14.5])
@@ -80,10 +82,10 @@ class HeatPump(object):
         self._fr = 0
         self._hcfluid = HeatCarrierFluid('water', self._TinHP, self._fr)
 
-        # Setup the update dependent properties flag :
+        # Load the database and set the model.
 
-        self._dependent_props = ['Tm', 'ToutHP', 'COP', 'CAP']
-        self._varstate_has_changed()
+        self._hpdb = load_heatpump_database()
+        self.set_model(0)
 
     def __str__(self):
         str_ = "model: %s" % self.model
