@@ -126,7 +126,7 @@ class HeatPump(object):
             self._varstate_has_changed()
         elif isinstance(value, str):
             if value in list(self._hpdb.keys()):
-                self._name = value
+                self._model = value
                 self._varstate_has_changed()
             else:
                 raise ValueError("Heatpump '%s' not found in the database"
