@@ -69,7 +69,7 @@ class HeatPump(object):
 
     An example is available in this
     `notebook <https://nbviewer.jupyter.org/github/jnsebgosselin/pygld/blob/
-    master/examples/example_heatpump.ipynb>`_.
+    master/examples/example_heatpump.ipynb?flush_cache=true>`_.
     """
 
     def __init__(self):
