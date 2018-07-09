@@ -9,7 +9,6 @@ install:
   - pip install pytest
   - pip install pytest-cov
   - pip install pytest-ordering
-  - pip install coveralls
   - pip install codecov
   - pip install matplotlib
   - pip install scipy
@@ -18,5 +17,4 @@ script:
   python runtests.py
 
 after_success:
-  - coveralls
   - codecov

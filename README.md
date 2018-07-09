@@ -7,4 +7,4 @@ Licensed under the terms of the MIT License
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Travis status](https://travis-ci.org/jnsebgosselin/pygld.svg?branch=master)](https://travis-ci.org/jnsebgosselin/pygld)
-[![Coverage Status](https://coveralls.io/repos/github/jnsebgosselin/pygld/badge.svg?branch=master)](https://coveralls.io/github/jnsebgosselin/pygld?branch=master)
+[![codecov](https://codecov.io/gh/jnsebgosselin/pygld/branch/master/graph/badge.svg)](https://codecov.io/gh/jnsebgosselin/pygld)
