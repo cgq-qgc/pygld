@@ -68,8 +68,8 @@ class HeatPump(object):
     ground-loop heat exchanger system.
 
     An example is available in this
-    `notebook <https://github.com/jnsebgosselin/pygld/blob/master/examples/
-    example_heatpump.ipynb>`_.
+    `notebook <https://nbviewer.jupyter.org/github/jnsebgosselin/pygld/blob/
+    master/examples/example_heatpump.ipynb>`_.
     """
 
     def __init__(self):
