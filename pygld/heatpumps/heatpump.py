@@ -8,6 +8,8 @@
 
 # ---- Standard imports
 
+import copy
+
 # ---- Third party imports
 
 import numpy as np
@@ -60,6 +62,11 @@ corrtbl_afreeze[tbl_fluid2['name']] = tbl_fluid2
 
 
 class HeatPump(object):
+    """
+    The :attr:`~pygld.HeatPump` holds all the properties and handles all the
+    calculation and modelling related to a single heatpump coupled to a
+    ground-loop heat exchanger system.
+    """
 
     def __init__(self):
         self._hpdb = load_heatpump_database()
@@ -95,24 +102,30 @@ class HeatPump(object):
 
     @property
     def hpdata(self):
-        """Performance data of the heatpump."""
+        """Return the performance data of the heatpump stored in a dict."""
         return self._hpdb[self.model]
 
     @property
     def model(self):
-        """Model of the heatpump."""
+        """Return the fabrication model of the heatpump."""
         return self._model
 
     def set_model(self, value):
-        """
-        Set the name of the heatpump either from an index or a key. If the
-        index or key is not found in the database, an error is raised.
+        """Set the fabrication model of the heatpump.
+
+        Set the fabrication model of the heatpump, either from an `index` or a
+        `str`. If the `index` or the `str` is not a valid key of the heatpump
+        models database, an error is raised.
+        The list of heatpump models available in the databse can be obtained
+        with the :meth:`~pygld.HeatPump.get_avail_heatpump_models` method.
         """
         if isinstance(value, int):
             self._model = self.get_avail_heatpump_models()[value]
+            self._varstate_has_changed()
         elif isinstance(value, str):
             if value in list(self._hpdb.keys()):
                 self._name = value
+                self._varstate_has_changed()
             else:
                 raise ValueError("Heatpump '%s' not found in the database"
                                  % value)
@@ -125,10 +138,11 @@ class HeatPump(object):
     def fluid(self):
         """Heat carrier fluid type.
 
-        Get or set the type of heat carrier fluid used in the geothermal
-        heat exchanger. The currently available fluid types are 'water',
-        'ethyl_glycol', and 'prop_glycol'.
-        The heat carrier fluid is assumed to be 'water' when
+        Get or set the type of the heat carrier fluid used in the geothermal
+        heat exchanger. By default, the heat carrier is set to pure water.
+        The list of available heat carrier fluid types can be obtained with
+        the :meth:`~pygld.HeatPump.get_avail_fluid_types` method.
+        The heat carrier fluid is assumed to be pure water when
         :attr:`~pygld.HeatPump.fr` is set to 0.
         """
         return self._hcfluid.fluid
@@ -156,8 +170,15 @@ class HeatPump(object):
 
     @property
     def TinHP(self):
-        """
-        Temperature of the water entering the heatpump in °C.
+        """Temperature of the water entering the heatpump in °C.
+
+        Get or set the temperature of the water entering the heatpump as a
+        single value or a series of values. A :attr:`~pygld.HeatPump.ToutHP`,
+        :attr:`~pygld.HeatPump.Tm`, :attr:`~pygld.HeatPump.COP`, and
+        :attr:`~pygld.HeatPump.CAP` value is calculated for every value of
+        :attr:`~pygld.HeatPump.TinHP`. A numpy array will always be returned
+        when getting :attr:`~pygld.HeatPump.TinHP`, independently of the
+        format used to set the attribute.
         """
         return np.copy(self._TinHP)
 
@@ -170,9 +191,18 @@ class HeatPump(object):
 
     @property
     def qbat(self):
-        """
-        Part of the building thermal load applied to the heatpump in kW
+        """Building thermal load applied to the heatpump in kW
         (- for cooling, + for heating).
+
+        Get or set the portion of the building thermal load that is applied to
+        the heatpump as a single value or a series of values. The lenght of
+        the data series used to set the attribute must match exactly that of
+        the :attr:`~pygld.HeatPump.TinHP`, or an error will be raised when
+        computing the dependent properties (:attr:`~pygld.HeatPump.ToutHP`,
+        :attr:`~pygld.HeatPump.Tm`, :attr:`~pygld.HeatPump.COP`, and
+        :attr:`~pygld.HeatPump.CAP`). Negative values are used to
+        represent the cooling thermal loads of the building while positive
+        values are used to represent the heating thermal loads.
         """
         return np.copy(self._qbat)
 
@@ -184,8 +214,15 @@ class HeatPump(object):
 
     @property
     def Vf(self):
-        """
-        Volumetric flowrate of the fluid through the heatpump in L/s
+        """Volumetric flowrate of the heat carrier fluid in L/s.
+
+        Get or set the volumetric flowrate of the heat carrier fluid
+        circulating through the heatpump as a single value or a series of
+        values. The lenght of the data series used to set the attribute must
+        match exactly that of the :attr:`~pygld.HeatPump.TinHP`, or an error
+        will be raised when computing the dependent properties
+        (:attr:`~pygld.HeatPump.ToutHP`, :attr:`~pygld.HeatPump.Tm`,
+        :attr:`~pygld.HeatPump.COP`, and :attr:`~pygld.HeatPump.CAP`).
         """
         return np.copy(self._Vf)
 
@@ -199,26 +236,47 @@ class HeatPump(object):
 
     @property
     def ToutHP(self):
-        """
-        Temperature of the water leaving the heatpump in °C.
+        """Temperature of the water leaving the heatpump in °C.
+
+        Get the temperature of the water leaving the heatpump as a series of
+        values stored in a numpy array of a length that match that of
+        :attr:`~pygld.HeatPump.TinHP`.
         """
         return np.copy(self._calcul_ToutHP())
 
     @property
     def Tm(self):
-        """
-        Mean temperature of the water circulating through the heatpump in °C
+        """Mean temperature of the water circulating through the
+        heatpump in °C.
+
+        Get the mean temperature of the water circulating through the heatpump
+        as series of values stored in a numpy array of a length that match that
+        of :attr:`~pygld.HeatPump.TinHP`.
         """
         return np.copy(self._calcul_Tm())
 
     @property
     def COP(self):
-        """Coefficient of performance of the heatpump."""
+        """Coefficient of performance of the heatpump.
+
+        Get the coefficient of performance of the heatpump as series of values
+        stored in a numpy array of a length that match that of
+        :attr:`~pygld.HeatPump.TinHP`. The coefficients are calculated either
+        for the cooling or heating mode according to the sign of the values
+        set for :attr:`~pygld.HeatPump.qbat`.
+        """
         return np.copy(self._calcul_COP())
 
     @property
     def CAP(self):
-        """Capacity of the heatpump in kW."""
+        """Capacity of the heatpump in kW.
+
+        Get the capacity of the heatpump as series of values stored in a numpy
+        array of a length that match that of :attr:`~pygld.HeatPump.TinHP`.
+        The capacities are calculated either for the cooling or heating mode
+        according to the sign of the values set for
+        :attr:`~pygld.HeatPump.qbat`.
+        """
         return np.copy(self._calcul_CAP())
 
     # ---- Calculs
@@ -334,15 +392,16 @@ class HeatPump(object):
 
     # ---- Utility methods
 
-    def in_table(self, varname, p1, p2):
+    def in_table(self, varname, TinHP, Vf):
         """
-        Check whether the (p1, p2) point is inside or outside the data table
-        for the specified variable. COP or CAP values evaluated outside the
-        data table (extrapolation) must be used with care.
+        Return whether the (TinHP, Vf) pair of values is inside or outside the
+        performance data table of the heatpump for the specified varname.
+        COP or CAP values evaluated outside the data table (extrapolation)
+        must be used with care.
+        """
+        # Based on this stackoverflow answer:
+        # http://stackoverflow.com/a/16898636/4481445
 
-        Based on this stackoverflow answer:
-        http://stackoverflow.com/a/16898636/4481445
-        """
         y = self._hpdb[self.model][varname]
         indx = np.where(~np.isnan(y))[0]
 
@@ -350,11 +409,12 @@ class HeatPump(object):
         x2 = self._hpdb[self.model]['GPM'][indx]
 
         hull = Delaunay(np.vstack((x1, x2)).T)
-        return bool(hull.find_simplex((p1, p2)) >= 0)
+        return bool(hull.find_simplex((TinHP, Vf)) >= 0)
 
     def get_flowRange(self):
         """
-        Return the minimum and maximum operational flowrate of the heatpump.
+        Return the minimum and maximum operational flowrate of the heatpump
+        in L/s.
         """
         vmax = np.max(self._hpdb[self.model]['GPM'])
         vmin = np.min(self._hpdb[self.model]['GPM'])
@@ -364,8 +424,8 @@ class HeatPump(object):
         """
         Produce a graph that shows the goodness of fit of the equation-fit
         models used to evaluate the COP and CAP values of the heatpump as a
-        function of the entering water temperature (EWT) and volumetric
-        flowrate.
+        function of the entering water temperature (TinHP) and the volumetric
+        flowrate (Vf).
         """
         plot_fitmodel_eval_from(self.hpdata)
 
@@ -378,7 +438,7 @@ class HeatPump(object):
         return list(self._hpdb.keys())
 
     def print_avail_heatpump_models(self):
-        """Print the list of the available heatpump models in the database."""
+        """Print the list of all available heatpump models in the database."""
         models = self.get_avail_heatpump_models()
         N = len(models)
         max_indent = (N-1)//10
