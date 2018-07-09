@@ -12,6 +12,8 @@ import numpy as np
 from scipy import interpolate
 import os
 
+FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
+
 
 class HeatCarrierFluid(object):
     """
@@ -84,8 +86,7 @@ class HeatCarrierFluid(object):
             self.__fluid = 'water'
             filename = 'proptables_purewater.npy'
         else:
-            raise ValueError('Supported fluid value are',
-                             ['water', 'prop_glycol', 'ethyl_glycol'])
+            raise ValueError('Supported fluid value are', FLUIDS)
 
         dirname = os.path.dirname(os.path.realpath(__file__))
         pathname = os.path.join(dirname, 'tables', filename)

@@ -13,6 +13,7 @@ import os
 # ---- Third party imports
 
 import pytest
+import numpy as np
 
 # ---- Local imports
 
@@ -29,36 +30,22 @@ def test_heatpump_init():
 
     # Assert the default values for the independent variables.
 
-    propnames = ['TinHP', 'qbat', 'Vf']
-    expected_vals = [(28, 0), (16.5, 14.5), (0.94635295, 0.94635295)]
-    for (propname, expected_val) in zip(propnames, expected_vals):
-        prop = getattr(heatpump, propname)
-        assert id(prop) == id(getattr(heatpump, propname))
-
-        assert (prop.c == prop.cooling == prop['c'] == prop['cooling'] ==
-                prop[0] == expected_val[0])
-        assert (prop.h == prop.heating == prop['h'] == prop['heating'] ==
-                prop[1] == expected_val[1])
-
+    assert np.array_equal(heatpump.TinHP, np.array([28, 0]))
+    assert np.array_equal(heatpump.qbat, np.array([-16.5, 14.5]))
+    assert np.array_equal(heatpump.Vf, np.array([0.94635295, 0.94635295]))
     assert heatpump.fluid == 'water'
     assert heatpump.fr == 0
 
     # Assert the default values for the dependent variables.
 
-    propnames = ['COP', 'CAP', 'ToutHP', 'Tm']
-    expected_vals = [(3.849727, 3.372328), (20.926771, 17.196401),
-                     (33.273623, -2.555170), (30.636812, -1.277585)]
-    for (propname, expected_val) in zip(propnames, expected_vals):
-        prop = getattr(heatpump, propname)
-        assert id(prop) == id(getattr(heatpump, propname))
-
-        assert (round(prop.c, 6) == round(prop.cooling, 6) ==
-                round(prop['c'], 6) == round(prop['cooling'], 6) ==
-                round(prop[0], 6) == expected_val[0])
-
-        assert (round(prop.h, 6) == round(prop.heating, 6) ==
-                round(prop['h'], 6) == round(prop['heating'], 6) ==
-                round(prop[1], 6) == expected_val[1])
+    assert np.array_equal(np.round(heatpump.COP, 6),
+                          np.array([3.849727, 3.372328]))
+    assert np.array_equal(np.round(heatpump.CAP, 6),
+                          np.array([20.926771, 17.196401]))
+    assert np.array_equal(np.round(heatpump.ToutHP, 6),
+                          np.array([33.273623, -2.555170]))
+    assert np.array_equal(np.round(heatpump.Tm, 6),
+                          np.array([30.636812, -1.277585]))
 
 
 def test_heatpump_need_update_flags():
@@ -79,17 +66,93 @@ def test_heatpump_need_update_flags():
     for key, value in heatpump._need_update.items():
         assert value is False
 
-    heatpump.TinHP.c = 34
+    heatpump.TinHP = 34
 
     for key, value in heatpump._need_update.items():
         assert value is True
 
 
-def test_calcul_Tm():
-    """Test that the average fluid temperature is calculated correctly."""
+def test_lenght_notequal_error():
+    """
+    Test that an error is raised when TinHP, qtbat, and Vf length does not
+    match perfectly.
+    """
     heatpump = HeatPump()
-    assert 0.5 * (heatpump.TinHP.c + heatpump.ToutHP.c) == heatpump.Tm.c
-    assert 0.5 * (heatpump.TinHP.h + heatpump.ToutHP.h) == heatpump.Tm.h
+    heatpump.TinHP = 28
+
+    with pytest.raises(ValueError):
+        print(heatpump.ToutHP)
+
+    heatpump.TinHP = [28, 0]
+    heatpump.qbat = [-16.5, 14.5, 12]
+    with pytest.raises(ValueError):
+        print(heatpump.ToutHP)
+
+
+def test_single_value():
+    """
+    Test that everything is working as expected when working with
+    single values
+    """
+    heatpump = HeatPump()
+    heatpump.TinHP = 28
+    heatpump.Vf = 0.94635295
+    heatpump.qbat = -16.5
+
+    assert np.round(heatpump.ToutHP, 6) == 33.273623
+    assert np.round(heatpump.COP, 6) == 3.849727
+    assert np.round(heatpump.CAP, 6) == 20.926771
+    assert np.round(heatpump.Tm, 6) == 30.636812
+
+
+def test_public_interface_insulation():
+    """
+    Test that it is not possible to modify the private variable outside of
+    the public interface.
+    """
+    heatpump = HeatPump()
+
+    # Independent variables.
+
+    TinHP = np.array([1, 2, 3, 4])
+    heatpump.TinHP = TinHP
+    assert np.array_equal(heatpump.TinHP, TinHP)
+    assert id(TinHP) != id(heatpump.TinHP)
+    assert id(TinHP) != id(heatpump._TinHP)
+    assert id(heatpump.TinHP) != id(heatpump._TinHP)
+
+    Vf = np.array([5, 4, 3, 2])
+    heatpump.Vf = Vf
+    assert np.array_equal(heatpump.Vf, Vf)
+    assert id(Vf) != id(heatpump.Vf)
+    assert id(Vf) != id(heatpump._Vf)
+    assert id(heatpump.Vf) != id(heatpump._Vf)
+
+    qbat = np.array([10, -14, 30, -32])
+    heatpump.qbat = qbat
+    assert np.array_equal(heatpump.qbat, qbat)
+    assert id(qbat) != id(heatpump.qbat)
+    assert id(qbat) != id(heatpump._qbat)
+    assert id(heatpump.qbat) != id(heatpump._qbat)
+
+    fluid = 'ethyl_glycol'
+    heatpump.fluid = fluid
+    assert heatpump.fluid == 'ethyl_glycol'
+    fluid = 'water'
+    assert heatpump.fluid == 'ethyl_glycol'
+
+    fr = 0.5
+    heatpump.fr = fr
+    assert heatpump.fr == 0.5
+    fluid = 0.25
+    assert heatpump.fr == 0.5
+
+    # Dependent variables.
+
+    assert id(heatpump.ToutHP) != id(heatpump._ToutHP)
+    assert id(heatpump.Tm) != id(heatpump._Tm)
+    assert id(heatpump.COP) != id(heatpump._COP)
+    assert id(heatpump.CAP) != id(heatpump._CAP)
 
 
 if __name__ == "__main__":
