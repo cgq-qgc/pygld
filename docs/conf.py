@@ -14,7 +14,7 @@
 
 import os.path as osp
 import sys
-dirname = osp.dirname(osp.dirname(osp.dirname(__file__)))
+dirname = osp.dirname(osp.dirname(__file__))
 sys.path.insert(0, osp.abspath(dirname))
 
 # -- Project information -----------------------------------------------------
