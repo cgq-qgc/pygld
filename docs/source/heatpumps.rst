@@ -7,6 +7,7 @@ HeatPump class
    :no-members:
    :no-undoc-members:
 
+
 Model and Data
 ---------------------------------
 
@@ -46,7 +47,7 @@ Utilities
 ---------------------------------
 
 .. automethod:: pygld.HeatPump.in_table
-.. automethod:: pygld.HeatPump.get_flowRange
+.. automethod:: pygld.HeatPump.get_flowrange
 .. automethod:: pygld.HeatPump.get_avail_fluid_types
 .. automethod:: pygld.HeatPump.get_avail_heatpump_models
 .. automethod:: pygld.HeatPump.print_avail_heatpump_models

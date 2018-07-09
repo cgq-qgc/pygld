@@ -66,6 +66,10 @@ class HeatPump(object):
     The :attr:`~pygld.HeatPump` holds all the properties and handles all the
     calculation and modelling related to a single heatpump coupled to a
     ground-loop heat exchanger system.
+
+    An example is available in this
+    `notebook <https://github.com/jnsebgosselin/pygld/blob/master/examples/
+    example_heatpump.ipynb>`_.
     """
 
     def __init__(self):
