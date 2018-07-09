@@ -8,8 +8,6 @@
 
 # ---- Standard imports
 
-import copy
-
 # ---- Third party imports
 
 import numpy as np
@@ -125,8 +123,15 @@ class HeatPump(object):
 
     @property
     def fluid(self):
-        """Type of heat carrier fluid."""
-        return copy.copy(self._hcfluid.fluid)
+        """Heat carrier fluid type.
+
+        Get or set the type of heat carrier fluid used in the geothermal
+        heat exchanger. The currently available fluid types are 'water',
+        'ethyl_glycol', and 'prop_glycol'.
+        The heat carrier fluid is assumed to be 'water' when
+        :attr:`~pygld.HeatPump.fr` is set to 0.
+        """
+        return self._hcfluid.fluid
 
     @fluid.setter
     def fluid(self, x):
@@ -135,8 +140,14 @@ class HeatPump(object):
 
     @property
     def fr(self):
-        """Volumetric fraction of antifreeze in the heat carrier fluid."""
-        return copy.copy(self._hcfluid.fr)
+        """Antifreeze volumetric fraction of the heat carrier fluid in m³/m³
+        (0 ≤ fr ≤ 1).
+
+        Get or set the antifreeze volumetric fraction of the heat carrier
+        fluid. The value of `fr` must be between 0 and 1 and is assumed to be
+        0 when :attr:`~pygld.HeatPump.fluid` is set to 'water'.
+        """
+        return self._hcfluid.fr
 
     @fr.setter
     def fr(self, x):
@@ -146,7 +157,7 @@ class HeatPump(object):
     @property
     def TinHP(self):
         """
-        Temperature of the water entering the heatpump in ºC.
+        Temperature of the water entering the heatpump in °C.
         """
         return np.copy(self._TinHP)
 
@@ -189,14 +200,14 @@ class HeatPump(object):
     @property
     def ToutHP(self):
         """
-        Temperature of the water leaving the heatpump in ºC.
+        Temperature of the water leaving the heatpump in °C.
         """
         return np.copy(self._calcul_ToutHP())
 
     @property
     def Tm(self):
         """
-        Mean temperature of the water circulating through the heatpump in ºC
+        Mean temperature of the water circulating through the heatpump in °C
         """
         return np.copy(self._calcul_Tm())
 
