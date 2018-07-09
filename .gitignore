@@ -1,4 +1,11 @@
 hp_database.npy
+make.bat
+make_html.bat
+Makefile
+proptables_ethylglycol.xls
+proptables_propglycol.xls
+proptables_purewater.xls
+setup_fluid_tables.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -101,9 +108,4 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-proptables_ethylglycol.xls
-proptables_propglycol.xls
-proptables_purewater.xls
-setup_fluid_tables.py
 
