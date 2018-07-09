@@ -15,7 +15,7 @@ from scipy.spatial import Delaunay
 
 # ---- Local imports
 
-from pygld.fluidproperties import HeatCarrierFluid
+from pygld.fluidproperties import HeatCarrierFluid, FLUIDS
 from pygld.heatpumps.utils import load_heatpump_database
 from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
@@ -368,6 +368,10 @@ class HeatPump(object):
         flowrate.
         """
         plot_fitmodel_eval_from(self.hpdata)
+
+    def get_avail_fluid_types(self):
+        """Return a list of all available heat carrier fluid types."""
+        return copy.copy(FLUIDS)
 
     def get_avail_heatpump_models(self):
         """Return a list of all available heatpump models in the database."""
