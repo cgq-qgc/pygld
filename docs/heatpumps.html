@@ -1,0 +1,296 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HeatPump class &#8212; PyGLD 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="PyGLD Documentation" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="PyGLD Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyGLD 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="heatpump-class">
+<h1>HeatPump class<a class="headerlink" href="#heatpump-class" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pygld.HeatPump">
+<em class="property">class </em><code class="descclassname">pygld.</code><code class="descname">HeatPump</code><a class="reference external" href="https://github.com/jnsebgosselin/pygld/tree/master/pygld/heatpumps/heatpump.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pygld.HeatPump" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="#pygld.HeatPump" title="pygld.HeatPump"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HeatPump</span></code></a> holds all the properties and handles all the
+calculation and modelling related to a single heatpump coupled to a
+ground-loop heat exchanger system.</p>
+<p>An example is available in this
+<a class="reference external" href="https://github.com/jnsebgosselin/pygld/blob/master/examples/example_heatpump.ipynb">notebook</a>.</p>
+</dd></dl>
+
+<div class="section" id="model-and-data">
+<h2>Model and Data<a class="headerlink" href="#model-and-data" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="pygld.HeatPump.hpdata">
+<code class="descclassname">HeatPump.</code><code class="descname">hpdata</code><a class="headerlink" href="#pygld.HeatPump.hpdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the performance data of the heatpump stored in a dict.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.model">
+<code class="descclassname">HeatPump.</code><code class="descname">model</code><a class="headerlink" href="#pygld.HeatPump.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the fabrication model of the heatpump.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.set_model">
+<code class="descclassname">HeatPump.</code><code class="descname">set_model</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.set_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the fabrication model of the heatpump.</p>
+<p>Set the fabrication model of the heatpump, either from an <cite>index</cite> or a
+<cite>str</cite>. If the <cite>index</cite> or the <cite>str</cite> is not a valid key of the heatpump
+models database, an error is raised.
+The list of heatpump models available in the databse can be obtained
+with the <a class="reference internal" href="#pygld.HeatPump.get_avail_heatpump_models" title="pygld.HeatPump.get_avail_heatpump_models"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_avail_heatpump_models()</span></code></a> method.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="heat-carrier-fluid-properties">
+<h2>Heat carrier fluid properties<a class="headerlink" href="#heat-carrier-fluid-properties" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="pygld.HeatPump.fluid">
+<code class="descclassname">HeatPump.</code><code class="descname">fluid</code><a class="headerlink" href="#pygld.HeatPump.fluid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Heat carrier fluid type.</p>
+<p>Get or set the type of the heat carrier fluid used in the geothermal
+heat exchanger. By default, the heat carrier is set to pure water.
+The list of available heat carrier fluid types can be obtained with
+the <a class="reference internal" href="#pygld.HeatPump.get_avail_fluid_types" title="pygld.HeatPump.get_avail_fluid_types"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_avail_fluid_types()</span></code></a> method.
+The heat carrier fluid is assumed to be pure water when
+<a class="reference internal" href="#pygld.HeatPump.fr" title="pygld.HeatPump.fr"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fr</span></code></a> is set to 0.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.fr">
+<code class="descclassname">HeatPump.</code><code class="descname">fr</code><a class="headerlink" href="#pygld.HeatPump.fr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Antifreeze volumetric fraction of the heat carrier fluid in m³/m³
+(0 ≤ fr ≤ 1).</p>
+<p>Get or set the antifreeze volumetric fraction of the heat carrier
+fluid. The value of <cite>fr</cite> must be between 0 and 1 and is assumed to be
+0 when <a class="reference internal" href="#pygld.HeatPump.fluid" title="pygld.HeatPump.fluid"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fluid</span></code></a> is set to ‘water’.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="heatpump-independent-properties">
+<h2>Heatpump independent properties<a class="headerlink" href="#heatpump-independent-properties" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="pygld.HeatPump.qbat">
+<code class="descclassname">HeatPump.</code><code class="descname">qbat</code><a class="headerlink" href="#pygld.HeatPump.qbat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Building thermal load applied to the heatpump in kW
+(- for cooling, + for heating).</p>
+<p>Get or set the portion of the building thermal load that is applied to
+the heatpump as a single value or a series of values. The lenght of
+the data series used to set the attribute must match exactly that of
+the <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>, or an error will be raised when
+computing the dependent properties (<a class="reference internal" href="#pygld.HeatPump.ToutHP" title="pygld.HeatPump.ToutHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ToutHP</span></code></a>,
+<a class="reference internal" href="#pygld.HeatPump.Tm" title="pygld.HeatPump.Tm"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Tm</span></code></a>, <a class="reference internal" href="#pygld.HeatPump.COP" title="pygld.HeatPump.COP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COP</span></code></a>, and
+<a class="reference internal" href="#pygld.HeatPump.CAP" title="pygld.HeatPump.CAP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CAP</span></code></a>). Negative values are used to
+represent the cooling thermal loads of the building while positive
+values are used to represent the heating thermal loads.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.TinHP">
+<code class="descclassname">HeatPump.</code><code class="descname">TinHP</code><a class="headerlink" href="#pygld.HeatPump.TinHP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature of the water entering the heatpump in °C.</p>
+<p>Get or set the temperature of the water entering the heatpump as a
+single value or a series of values. A <a class="reference internal" href="#pygld.HeatPump.ToutHP" title="pygld.HeatPump.ToutHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ToutHP</span></code></a>,
+<a class="reference internal" href="#pygld.HeatPump.Tm" title="pygld.HeatPump.Tm"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Tm</span></code></a>, <a class="reference internal" href="#pygld.HeatPump.COP" title="pygld.HeatPump.COP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COP</span></code></a>, and
+<a class="reference internal" href="#pygld.HeatPump.CAP" title="pygld.HeatPump.CAP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CAP</span></code></a> value is calculated for every value of
+<a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>. A numpy array will always be returned
+when getting <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>, independently of the
+format used to set the attribute.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.Vf">
+<code class="descclassname">HeatPump.</code><code class="descname">Vf</code><a class="headerlink" href="#pygld.HeatPump.Vf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Volumetric flowrate of the heat carrier fluid in L/s.</p>
+<p>Get or set the volumetric flowrate of the heat carrier fluid
+circulating through the heatpump as a single value or a series of
+values. The lenght of the data series used to set the attribute must
+match exactly that of the <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>, or an error
+will be raised when computing the dependent properties
+(<a class="reference internal" href="#pygld.HeatPump.ToutHP" title="pygld.HeatPump.ToutHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ToutHP</span></code></a>, <a class="reference internal" href="#pygld.HeatPump.Tm" title="pygld.HeatPump.Tm"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Tm</span></code></a>,
+<a class="reference internal" href="#pygld.HeatPump.COP" title="pygld.HeatPump.COP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COP</span></code></a>, and <a class="reference internal" href="#pygld.HeatPump.CAP" title="pygld.HeatPump.CAP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CAP</span></code></a>).</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A numpy array will always be returned when getting
+<a class="reference internal" href="#pygld.HeatPump.qbat" title="pygld.HeatPump.qbat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">qbat</span></code></a>, <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>, or
+<a class="reference internal" href="#pygld.HeatPump.Vf" title="pygld.HeatPump.Vf"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Vf</span></code></a> independently of the format used to
+set the attribute.</p>
+</div>
+</div>
+<div class="section" id="heatpump-dependent-properties">
+<h2>Heatpump dependent properties<a class="headerlink" href="#heatpump-dependent-properties" title="Permalink to this headline">¶</a></h2>
+<dl class="attribute">
+<dt id="pygld.HeatPump.Tm">
+<code class="descclassname">HeatPump.</code><code class="descname">Tm</code><a class="headerlink" href="#pygld.HeatPump.Tm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mean temperature of the water circulating through the
+heatpump in °C.</p>
+<p>Get the mean temperature of the water circulating through the heatpump
+as series of values stored in a numpy array of a length that match that
+of <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.ToutHP">
+<code class="descclassname">HeatPump.</code><code class="descname">ToutHP</code><a class="headerlink" href="#pygld.HeatPump.ToutHP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temperature of the water leaving the heatpump in °C.</p>
+<p>Get the temperature of the water leaving the heatpump as a series of
+values stored in a numpy array of a length that match that of
+<a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.CAP">
+<code class="descclassname">HeatPump.</code><code class="descname">CAP</code><a class="headerlink" href="#pygld.HeatPump.CAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Capacity of the heatpump in kW.</p>
+<p>Get the capacity of the heatpump as series of values stored in a numpy
+array of a length that match that of <a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>.
+The capacities are calculated either for the cooling or heating mode
+according to the sign of the values set for
+<a class="reference internal" href="#pygld.HeatPump.qbat" title="pygld.HeatPump.qbat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">qbat</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pygld.HeatPump.COP">
+<code class="descclassname">HeatPump.</code><code class="descname">COP</code><a class="headerlink" href="#pygld.HeatPump.COP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coefficient of performance of the heatpump.</p>
+<p>Get the coefficient of performance of the heatpump as series of values
+stored in a numpy array of a length that match that of
+<a class="reference internal" href="#pygld.HeatPump.TinHP" title="pygld.HeatPump.TinHP"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TinHP</span></code></a>. The coefficients are calculated either
+for the cooling or heating mode according to the sign of the values
+set for <a class="reference internal" href="#pygld.HeatPump.qbat" title="pygld.HeatPump.qbat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">qbat</span></code></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="method">
+<dt id="pygld.HeatPump.in_table">
+<code class="descclassname">HeatPump.</code><code class="descname">in_table</code><span class="sig-paren">(</span><em>varname</em>, <em>TinHP</em>, <em>Vf</em><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.in_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the (TinHP, Vf) pair of values is inside or outside the
+performance data table of the heatpump for the specified varname.
+COP or CAP values evaluated outside the data table (extrapolation)
+must be used with care.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.get_flowrange">
+<code class="descclassname">HeatPump.</code><code class="descname">get_flowrange</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.get_flowrange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the minimum and maximum operational flowrate of the heatpump
+in L/s.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.get_avail_fluid_types">
+<code class="descclassname">HeatPump.</code><code class="descname">get_avail_fluid_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.get_avail_fluid_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all available heat carrier fluid types.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.get_avail_heatpump_models">
+<code class="descclassname">HeatPump.</code><code class="descname">get_avail_heatpump_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.get_avail_heatpump_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all available heatpump models in the database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.print_avail_heatpump_models">
+<code class="descclassname">HeatPump.</code><code class="descname">print_avail_heatpump_models</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.print_avail_heatpump_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the list of all available heatpump models in the database.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pygld.HeatPump.plot_heatpump_model_goodness">
+<code class="descclassname">HeatPump.</code><code class="descname">plot_heatpump_model_goodness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pygld.HeatPump.plot_heatpump_model_goodness" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a graph that shows the goodness of fit of the equation-fit
+models used to evaluate the COP and CAP values of the heatpump as a
+function of the entering water temperature (TinHP) and the volumetric
+flowrate (Vf).</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HeatPump class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#model-and-data">Model and Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#heat-carrier-fluid-properties">Heat carrier fluid properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#heatpump-independent-properties">Heatpump independent properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#heatpump-dependent-properties">Heatpump dependent properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="PyGLD Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PyGLD 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Jean-Sébastien Gosselin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.1.
+    </div>
+  </body>
+</html>

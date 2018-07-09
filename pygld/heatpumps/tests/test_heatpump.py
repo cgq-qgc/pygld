@@ -155,5 +155,52 @@ def test_public_interface_insulation():
     assert id(heatpump.CAP) != id(heatpump._CAP)
 
 
+def test_get_set_model():
+    """
+    Test that the method to set the model of the heatpump is working as
+    expected.
+    """
+    heatpump = HeatPump()
+    model_list = heatpump.get_avail_heatpump_models()
+
+    # Change the model with an index.
+
+    print(heatpump)
+    for key, value in heatpump._need_update.items():
+        assert value is False
+
+    heatpump.set_model(3)
+    assert heatpump.model == model_list[3]
+    for key, value in heatpump._need_update.items():
+        assert value is True
+
+    # Change the model with a str.
+
+    print(heatpump)
+    for key, value in heatpump._need_update.items():
+        assert value is False
+
+    heatpump.set_model(model_list[1])
+    assert heatpump.model == model_list[1]
+    for key, value in heatpump._need_update.items():
+        assert value is True
+
+    # Test errors.
+
+    expected_model = heatpump.model
+
+    with pytest.raises(IndexError):
+        heatpump.set_model(999999)
+    assert heatpump.model == expected_model
+
+    with pytest.raises(ValueError):
+        heatpump.set_model('dummy_model_name')
+    assert heatpump.model == expected_model
+
+    with pytest.raises(TypeError):
+        heatpump.set_model(12.34)
+    assert heatpump.model == expected_model
+
+
 if __name__ == "__main__":
     pytest.main(['-x', os.path.basename(__file__), '-v', '-rw'])
