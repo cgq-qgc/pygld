@@ -363,7 +363,6 @@ class HeatPump(object):
         # Calcul values when heating.
 
         indx = np.where(self._qbat >= 0)[0]
-        print(self._qbat, indx)
         ndarray[indx] = self._eval_fitmodel_for(
             varname + 'h', self._TinHP[indx], self._Vf[indx])
 
@@ -413,7 +412,7 @@ class HeatPump(object):
         hull = Delaunay(np.vstack((x1, x2)).T)
         return bool(hull.find_simplex((TinHP, Vf)) >= 0)
 
-    def get_flowRange(self):
+    def get_flowrange(self):
         """
         Return the minimum and maximum operational flowrate of the heatpump
         in L/s.
