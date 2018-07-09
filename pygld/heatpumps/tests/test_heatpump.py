@@ -106,7 +106,54 @@ def test_single_value():
 
 
 def test_public_interface_insulation():
-    pass
+    """
+    Test that it is not possible to modify the private variable outside of
+    the public interface.
+    """
+    heatpump = HeatPump()
+
+    # Independent variables.
+
+    TinHP = np.array([1, 2, 3, 4])
+    heatpump.TinHP = TinHP
+    assert np.array_equal(heatpump.TinHP, TinHP)
+    assert id(TinHP) != id(heatpump.TinHP)
+    assert id(TinHP) != id(heatpump._TinHP)
+    assert id(heatpump.TinHP) != id(heatpump._TinHP)
+
+    Vf = np.array([5, 4, 3, 2])
+    heatpump.Vf = Vf
+    assert np.array_equal(heatpump.Vf, Vf)
+    assert id(Vf) != id(heatpump.Vf)
+    assert id(Vf) != id(heatpump._Vf)
+    assert id(heatpump.Vf) != id(heatpump._Vf)
+
+    qbat = np.array([10, -14, 30, -32])
+    heatpump.qbat = qbat
+    assert np.array_equal(heatpump.qbat, qbat)
+    assert id(qbat) != id(heatpump.qbat)
+    assert id(qbat) != id(heatpump._qbat)
+    assert id(heatpump.qbat) != id(heatpump._qbat)
+
+    fluid = 'ethyl_glycol'
+    heatpump.fluid = fluid
+    assert heatpump.fluid == 'ethyl_glycol'
+    fluid = 'water'
+    assert heatpump.fluid == 'ethyl_glycol'
+
+    fr = 0.5
+    heatpump.fr = fr
+    assert heatpump.fr == 0.5
+    fluid = 0.25
+    assert heatpump.fr == 0.5
+
+    # Dependent variables.
+
+    assert id(heatpump.ToutHP) != id(heatpump._ToutHP)
+    assert id(heatpump.Tm) != id(heatpump._Tm)
+    assert id(heatpump.COP) != id(heatpump._COP)
+    assert id(heatpump.CAP) != id(heatpump._CAP)
+
 
 if __name__ == "__main__":
     pytest.main(['-x', os.path.basename(__file__), '-v', '-rw'])
