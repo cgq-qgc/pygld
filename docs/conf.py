@@ -165,7 +165,6 @@ texinfo_documents = [
 
 imgmath_image_format = 'svg'
 imgmath_font_size = 12
-imgmath_dvisvgm_args = ['--font-format=woff,ah']
 
 
 def linkcode_resolve(domain, info):
