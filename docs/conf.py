@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.linkcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.imgmath'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -161,6 +162,10 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+
+imgmath_image_format = 'svg'
+imgmath_font_size = 12
+imgmath_dvisvgm_args = ['--font-format=woff,ah']
 
 
 def linkcode_resolve(domain, info):
