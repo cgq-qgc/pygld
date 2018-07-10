@@ -242,22 +242,63 @@ class HeatPump(object):
 
     @property
     def ToutHP(self):
-        """Temperature of the water leaving the heatpump in °C.
+        """Temperature of the fluid leaving the heatpump in °C.
 
-        Get the temperature of the water leaving the heatpump as a series of
+        Get the temperature of the fluid leaving the heatpump as a series of
         values stored in a numpy array of a length that match that of
         :attr:`~pygld.HeatPump.TinHP`.
+
+        The temperature of the fluid leaving the heatpump
+        (:attr:`~pygld.HeatPump.ToutHP`) is calculated as follow:
+
+        .. math::
+            ToutHP[i] = TinHP[i] + \\frac{qgnd[i]}
+                                         {Vf[i] \\cdot
+                                          \\rho_f[i] \\cdot
+                                          cp_f[i]}
+
+        where :math:`i` is the index at which :math:`TouHP` is computed,
+        :math:`Vf` is the flowrate of the fluid in L/s, :math:`TinHP` is the
+        temperature of the fluid leaving the heatpump in °C, :math:`\\rho_f[i]`
+        and :math:`cp_f[i]` are, respectively, the density in kg/m³ and the
+        specific heat capacity in J/(kg·K) of the fluid at :math:`TinHP`,
+        and :math:`qgnd` is the ground heat load in kW.
+        The ground heat load (:math:`qgnd`) is calculated as:
+
+        .. math::
+            qgnd[i] = -qbat[i] \\cdot (COPc[i] + 1)/COPc[i]
+            \\quad \\text{when} \\quad qbat[i] < 0 \\quad
+            \\text{(in cooling mode)}
+
+        .. math::
+            qgnd[i] = -qbat[i] \\cdot (COPh[i] - 1)/COPh[i]
+            \\quad \\text{when} \\quad qbat[i] > 0 \\quad
+            \\text{(in heating mode)}
+
+        where :math:`qbat` is the building thermal load in kW, and
+        :math:`COPc` and :math:`COPh` are, respectively, the coefficient of
+        performance of the heatpump computed for the cooling and heating mode.
         """
         return np.copy(self._calcul_ToutHP())
 
     @property
     def Tm(self):
-        """Mean temperature of the water circulating through the
+        """Mean temperature of the fluid circulating through the
         heatpump in °C.
 
-        Get the mean temperature of the water circulating through the heatpump
+        Get the mean temperature of the fluid circulating through the heatpump
         as series of values stored in a numpy array of a length that match that
         of :attr:`~pygld.HeatPump.TinHP`.
+
+        The mean temperature of the fluid circulating through the heatpump
+        (:attr:`~pygld.HeatPump.Tm`) is calculated as follow:
+
+        .. math::
+            Tm[i] = \\frac{(TinHP[i] + ToutHP[i])}{2}
+
+        where :math:`i` is the index at which :math:`Tm` is computed,
+        :math:`TinHP` and :math:`TouHP` are, respectively, the
+        temperature of the fluid entering and leaving the heatpump in °C.
         """
         return np.copy(self._calcul_Tm())
 
@@ -267,9 +308,29 @@ class HeatPump(object):
 
         Get the coefficient of performance of the heatpump as series of values
         stored in a numpy array of a length that match that of
-        :attr:`~pygld.HeatPump.TinHP`. The coefficients are calculated either
-        for the cooling or heating mode according to the sign of the values
-        set for :attr:`~pygld.HeatPump.qbat`.
+        :attr:`~pygld.HeatPump.TinHP`. At each index, the coefficients are
+        calculated either for the cooling or heating mode according to the
+        sign of :attr:`~pygld.HeatPump.qbat`.
+
+        The :attr:`~pygld.HeatPump.COP` and :attr:`~pygld.HeatPump.CAP`
+        are calculated with a second order polynomial equation-fit model
+        in two variables of the form :
+
+        .. math::
+            y[i] = a1 +
+                   a2 \\cdot TinHP[i] + a3 \\cdot TinHP[i]^2 +
+                   a4 \\cdot Vf[i] + a5 \\cdot Vf[i]^2 +
+                   a6 \\cdot TinHP[i] \\cdot Vf[i]
+
+        where :math:`a_i` are the coefficients, :math:`TinHP` is the
+        temperature of the fluid entering the heatpump, :math:`Vf` is the
+        flowrate and :math:`y` is the dependent variable that we want to model.
+        Four equations are thus needed to represent the coefficient of
+        performance (:math:`COP`) and capacity (:math:`CAP`) of the heatpump
+        in cooling and heating mode.
+        The coefficients :math:`a_i` are determined by least-squares
+        optimization using the performance data provided by the manufacturer
+        of the heatpump
         """
         return np.copy(self._calcul_COP())
 
@@ -282,6 +343,9 @@ class HeatPump(object):
         The capacities are calculated either for the cooling or heating mode
         according to the sign of the values set for
         :attr:`~pygld.HeatPump.qbat`.
+
+        See the :attr:`~pygld.HeatPump.COP` documentation for more information
+        on how CAP is calculated.
         """
         return np.copy(self._calcul_CAP())
 
@@ -318,7 +382,7 @@ class HeatPump(object):
             # Calcul the ground loads.
 
             self._calcul_COP()
-            qgnd = self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
+            qgnd = -self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
 
             # qbat is - for cooling and + for heating
             # qgnd = qbat * (COP + 1)/COP in cooling mode
@@ -326,7 +390,7 @@ class HeatPump(object):
 
             # Calculate outflow fluid temperature.
 
-            self._ToutHP = self._TinHP - qgnd/(self._Vf*rhof*cpf) * 10**6
+            self._ToutHP = self._TinHP + qgnd/(self._Vf*rhof*cpf) * 10**6
             self._need_update['ToutHP'] = False
         return self._ToutHP
 
