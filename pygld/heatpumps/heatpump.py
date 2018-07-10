@@ -318,7 +318,7 @@ class HeatPump(object):
             # Calcul the ground loads.
 
             self._calcul_COP()
-            qgnd = self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
+            qgnd = -self._qbat * (self._COP - np.sign(self._qbat)) / self._COP
 
             # qbat is - for cooling and + for heating
             # qgnd = qbat * (COP + 1)/COP in cooling mode
@@ -326,7 +326,7 @@ class HeatPump(object):
 
             # Calculate outflow fluid temperature.
 
-            self._ToutHP = self._TinHP - qgnd/(self._Vf*rhof*cpf) * 10**6
+            self._ToutHP = self._TinHP + qgnd/(self._Vf*rhof*cpf) * 10**6
             self._need_update['ToutHP'] = False
         return self._ToutHP
 
