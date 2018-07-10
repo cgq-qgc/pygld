@@ -282,6 +282,12 @@ class HeatPump(object):
         Get the mean temperature of the fluid circulating through the heatpump
         as series of values stored in a numpy array of a length that match that
         of :attr:`~pygld.HeatPump.TinHP`.
+
+        The mean temperature of the fluid circulating through the heatpump
+        (:attr:`~pygld.HeatPump.Tm`) is calculated as follow:
+
+        .. math::
+            Tm[i] = \\frac{(TinHP[i] + ToutHP[i])}{2}
         """
         return np.copy(self._calcul_Tm())
 
