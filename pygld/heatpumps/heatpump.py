@@ -253,14 +253,17 @@ class HeatPump(object):
 
         .. math::
             ToutHP[i] = TinHP[i] + \\frac{qgnd[i]}
-                                         {V_f[i] \\cdot
+                                         {Vf[i] \\cdot
                                           \\rho_f[i] \\cdot
                                           cp_f[i]}
 
-        where :math:`\\rho_f[i]` and :math:`cp_f[i]` are, respectively,
-        the density in kg/m³ and the specific heat capacity in J/(kg·K) of the
-        heat carrier fluid at index :math:`i` and :math:`qgnd` is the ground
-        heat load in kW, which is calculated as :
+        where :math:`i` is the index at which :math:`TouHP` is computed,
+        :math:`Vf` is the flowrate of the fluid in L/s, :math:`TinHP` is the
+        temperature of the fluid leaving the heatpump in °C, :math:`\\rho_f[i]`
+        and :math:`cp_f[i]` are, respectively, the density in kg/m³ and the
+        specific heat capacity in J/(kg·K) of the fluid at :math:`TinHP`,
+        and :math:`qgnd` is the ground heat load in kW.
+        The ground heat load (:math:`qgnd`) is calculated as:
 
         .. math::
             qgnd[i] = -qbat[i] \\cdot (COPc[i] + 1)/COPc[i]
@@ -271,6 +274,10 @@ class HeatPump(object):
             qgnd[i] = -qbat[i] \\cdot (COPh[i] - 1)/COPh[i]
             \\quad \\text{when} \\quad qbat[i] > 0 \\quad
             \\text{(in heating mode)}
+
+        where :math:`qbat` is the building thermal load in kW, and
+        :math:`COPc` and :math:`COPh` are, respectively, the coefficient of
+        performance of the heatpump computed for the cooling and heating mode.
         """
         return np.copy(self._calcul_ToutHP())
 
@@ -288,6 +295,10 @@ class HeatPump(object):
 
         .. math::
             Tm[i] = \\frac{(TinHP[i] + ToutHP[i])}{2}
+
+        where :math:`i` is the index at which :math:`Tm` is computed,
+        :math:`TinHP` and :math:`TouHP` are, respectively, the
+        temperature of the fluid entering and leaving the heatpump in °C.
         """
         return np.copy(self._calcul_Tm())
 
