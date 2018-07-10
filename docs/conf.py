@@ -181,3 +181,14 @@ def linkcode_resolve(domain, info):
         return filename
     else:
         return None
+
+
+# Additional stuff for the LaTeX preamble.
+
+latex_preamble = r'''
+\usepackage{amsmath}
+\DeclareUnicodeCharacter{00A0}{\nobreakspace}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage{times}
+'''
