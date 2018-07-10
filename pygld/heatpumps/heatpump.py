@@ -297,9 +297,29 @@ class HeatPump(object):
 
         Get the coefficient of performance of the heatpump as series of values
         stored in a numpy array of a length that match that of
-        :attr:`~pygld.HeatPump.TinHP`. The coefficients are calculated either
-        for the cooling or heating mode according to the sign of the values
-        set for :attr:`~pygld.HeatPump.qbat`.
+        :attr:`~pygld.HeatPump.TinHP`. At each index, the coefficients are
+        calculated either for the cooling or heating mode according to the
+        sign of :attr:`~pygld.HeatPump.qbat`.
+
+        The :attr:`~pygld.HeatPump.COP` and :attr:`~pygld.HeatPump.CAP`
+        are calculated with a second order polynomial equation-fit model
+        in two variables of the form :
+
+        .. math::
+            y[i] = a1 +
+                   a2 \\cdot TinHP[i] + a3 \\cdot TinHP[i]^2 +
+                   a4 \\cdot Vf[i] + a5 \\cdot Vf[i]^2 +
+                   a6 \\cdot TinHP[i] \\cdot Vf[i]
+
+        where :math:`a_i` are the coefficients, :math:`TinHP` is the
+        temperature of the fluid entering the heatpump, :math:`Vf` is the
+        flowrate and :math:`y` is the dependent variable that we want to model.
+        Four equations are thus needed to represent the coefficient of
+        performance (:math:`COP`) and capacity (:math:`CAP`) of the heatpump
+        in cooling and heating mode.
+        The coefficients :math:`a_i` are determined by least-squares
+        optimization using the performance data provided by the manufacturer
+        of the heatpump
         """
         return np.copy(self._calcul_COP())
 
@@ -312,6 +332,9 @@ class HeatPump(object):
         The capacities are calculated either for the cooling or heating mode
         according to the sign of the values set for
         :attr:`~pygld.HeatPump.qbat`.
+
+        See the :attr:`~pygld.HeatPump.COP` documentation for more information
+        on how CAP is calculated.
         """
         return np.copy(self._calcul_CAP())
 
