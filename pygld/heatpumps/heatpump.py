@@ -242,11 +242,35 @@ class HeatPump(object):
 
     @property
     def ToutHP(self):
-        """Temperature of the water leaving the heatpump in °C.
+        """Temperature of the fluid leaving the heatpump in °C.
 
-        Get the temperature of the water leaving the heatpump as a series of
+        Get the temperature of the fluid leaving the heatpump as a series of
         values stored in a numpy array of a length that match that of
         :attr:`~pygld.HeatPump.TinHP`.
+
+        The temperature of the fluid leaving the heatpump
+        (:attr:`~pygld.HeatPump.ToutHP`) is calculated as follow:
+
+        .. math::
+            ToutHP[i] = TinHP[i] + \\frac{qgnd[i]}
+                                         {V_f[i] \\cdot
+                                          \\rho_f[i] \\cdot
+                                          cp_f[i]}
+
+        where :math:`\\rho_f[i]` and :math:`cp_f[i]` are, respectively,
+        the density in kg/m³ and the specific heat capacity in J/(kg·K) of the
+        heat carrier fluid at index :math:`i` and :math:`qgnd` is the ground
+        heat load in kW, which is calculated as :
+
+        .. math::
+            qgnd[i] = -qbat[i] \\cdot (COPc[i] + 1)/COPc[i]
+            \\quad \\text{when} \\quad qbat[i] < 0 \\quad
+            \\text{(in cooling mode)}
+
+        .. math::
+            qgnd[i] = -qbat[i] \\cdot (COPh[i] - 1)/COPh[i]
+            \\quad \\text{when} \\quad qbat[i] > 0 \\quad
+            \\text{(in heating mode)}
         """
         return np.copy(self._calcul_ToutHP())
 
