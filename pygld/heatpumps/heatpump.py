@@ -276,10 +276,10 @@ class HeatPump(object):
 
     @property
     def Tm(self):
-        """Mean temperature of the water circulating through the
+        """Mean temperature of the fluid circulating through the
         heatpump in °C.
 
-        Get the mean temperature of the water circulating through the heatpump
+        Get the mean temperature of the fluid circulating through the heatpump
         as series of values stored in a numpy array of a length that match that
         of :attr:`~pygld.HeatPump.TinHP`.
         """
