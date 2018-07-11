@@ -68,8 +68,7 @@ class HeatCarrierFluid(object):
     """
 
     def __init__(self, fluid='water', Tref=20, fr=0):
-
-        self.fluid = fluid
+        self.set_fluid(fluid)
         self.Tref = Tref
         self.fr = fr
 
@@ -102,18 +101,30 @@ class HeatCarrierFluid(object):
 
     @property                                              # Heat carrier fluid
     def fluid(self):
-        return self.__fluid
+        """Return the type of fluid of the heat carrier.
 
-    @fluid.setter
-    def fluid(self, x):
+        The type of fluid of the heat carrier is set to pure water by default.
+        The heat carrier fluid is assumed to be pure water when
+        :attr:`~pygld.HeatCarrierFluid.fr` is set to 0.
+        """
+        return self._fluid
+
+    def set_fluid(self, x):
+        """Set the type of fluid of the heat carrier fluid and
+        load the tables of thermophysical properties of the fluid.
+
+        If the specified fluid type is not available, an error is raised.
+        The list of available heat carrier fluid types can be obtained with
+        the :meth:`~pygld.HeatCarrierFluid.get_avail_fluid_types` method.
+        """
         if x == 'prop_glycol':
-            self.__fluid = x
+            self._fluid = x
             filename = 'proptables_propglycol.npy'
         elif x == 'ethyl_glycol':
-            self.__fluid = x
+            self._fluid = x
             filename = 'proptables_ethylglycol.npy'
         elif x == 'water':
-            self.__fluid = 'water'
+            self._fluid = 'water'
             filename = 'proptables_purewater.npy'
         else:
             raise ValueError('Supported fluid value are', FLUIDS)
@@ -124,7 +135,6 @@ class HeatCarrierFluid(object):
         # TTP: Table of Thermophysical Properties
         self.__TTP = np.load(pathname)
 
-    # =========================================================================
 
     @property                                               # Temperature in °C
     def Tref(self):
