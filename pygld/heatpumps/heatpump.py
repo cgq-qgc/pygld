@@ -8,8 +8,6 @@
 
 # ---- Standard imports
 
-import copy
-
 # ---- Third party imports
 
 import numpy as np
@@ -17,7 +15,7 @@ from scipy.spatial import Delaunay
 
 # ---- Local imports
 
-from pygld.fluidproperties import HeatCarrierFluid, FLUIDS
+from pygld.fluidproperties import HeatCarrierFluid
 from pygld.heatpumps.utils import load_heatpump_database
 from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
@@ -67,9 +65,7 @@ class HeatPump(object):
     calculation and modelling related to a single heatpump coupled to a
     ground-loop heat exchanger system.
 
-    An example is available in this
-    `notebook <https://nbviewer.jupyter.org/github/jnsebgosselin/pygld/blob/
-    master/examples/example_heatpump.ipynb>`_.
+    An `Example`_ is available at the end of this section.
     """
 
     def __init__(self):
@@ -150,12 +146,15 @@ class HeatPump(object):
         the :meth:`~pygld.HeatPump.get_avail_fluid_types` method.
         The heat carrier fluid is assumed to be pure water when
         :attr:`~pygld.HeatPump.fr` is set to 0.
+
+        see also :attr:`pygld.HeatCarrierFluid.fluid` and
+        :meth:`pygld.HeatCarrierFluid.set_fluid`.
         """
         return self._hcfluid.fluid
 
     @fluid.setter
     def fluid(self, x):
-        self._hcfluid.fluid = x
+        self._hcfluid.set_fluid(x)
         self._varstate_has_changed()
 
     @property
@@ -165,7 +164,9 @@ class HeatPump(object):
 
         Get or set the antifreeze volumetric fraction of the heat carrier
         fluid. The value of `fr` must be between 0 and 1 and is assumed to be
-        0 when :attr:`~pygld.HeatPump.fluid` is set to 'water'.
+        0 when the :attr:`~pygld.HeatPump.fluid` is set to 'water'.
+
+        see also :attr:`pygld.HeatCarrierFluid.fr`.
         """
         return self._hcfluid.fr
 
@@ -500,7 +501,7 @@ class HeatPump(object):
 
     def get_avail_fluid_types(self):
         """Return a list of all available heat carrier fluid types."""
-        return copy.copy(FLUIDS)
+        return self._hcfluid.get_avail_fluid_types()
 
     def get_avail_heatpump_models(self):
         """Return a list of all available heatpump models in the database."""
