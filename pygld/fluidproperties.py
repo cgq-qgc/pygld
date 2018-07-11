@@ -25,49 +25,46 @@ FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
 
 class HeatCarrierFluid(object):
     """
-    Inputs:
-    -------
-    fluid = Name of the heat carrier fluid (water ; prop_glycol)
-    Tref  = Reference temperature in °C
-    fr    = Anti-freeze volumetric fraction (0 <= fr <= 1)
-            If fr = 0, properties of pure water at Tref are returned.
+    The :attr:`~pygld.HeatCarrierFluid` holds all the thermophysical
+    properties related to the fluid circulating in the ground-loop of the
+    heat exchanger system. The :attr:`~pygld.HeatCarrierFluid` is initialized
+    by default as a pure water :attr:`~pygld.HeatCarrierFluid.fluid` with an
+    antifreeze volumetric fraction (:attr:`~pygld.HeatCarrierFluid.fr`) of 0
+    and at a reference temperature (:attr:`~pygld.HeatCarrierFluid.Tref`)
+    of 20°C.
 
-    Primary Properties:
-    -------------------
-    rho = Fluid density in kg/m3
-    mu  = Cinematic viscosity in Pa.s
-    k   = Thermal conductivity in W/(m·k)
-    cp  = Specific Heat Capacity in J/(kg·K)
+    The fluid type of :attr:`~pygld.HeatCarrierFluid` can be changed with the
+    :meth:`~pygld.HeatCarrierFluid.set_fluid` method and a list of all
+    available heat carrier fluid types can be obtained from the
+    :meth:`~pygld.HeatCarrierFluid.get_avail_fluid_types` method. The
+    reference temperature and antifreeze volumetric fraction can be changed
+    by setting directly the value of the :attr:`~pygld.HeatCarrierFluid.Tref`
+    and :attr:`~pygld.HeatCarrierFluid.fr` attributes. Printing an instance of
+    :attr:`~pygld.HeatCarrierFluid` will print a summary of the fluid's
+    independent and dependent properties.
 
-    Derived Properties:
-    -------------------
-    nu = Kynematic viscosity in m²/s
-    Pr = Prantl number
-    al = Thermal diffusivity in m²/s
-    Cp = Volumetric heat capacity in J/(m3.K)
+    The freezing and boiling points of the
+    :attr:`~pygld.HeatCarrierFluid.fluid` are evaluated for a given value of
+    :attr:`~pygld.HeatCarrierFluid.fr` from a piecewise one-dimensional cubic
+    interpolation of the fluid's thermophysical properties table.
+    The thermophysical properties of the
+    :attr:`~pygld.HeatCarrierFluid.fluid` are determined for a given set of
+    :attr:`~pygld.HeatCarrierFluid.Tref` and :attr:`~pygld.HeatCarrierFluid.fr`
+    values from a two dimensional piecewise cubic interpolation of the
+    fluid's thermophysical properties table.
+    The derived thermophysical properties of the
+    :attr:`~pygld.HeatCarrierFluid.fluid` are calculated from the interpolated
+    values of the primary properties.
 
-    Others:
-    -------
-    Tfp = Freezing point temperature in °C
-    Tbp = Boiling point temperature in °C
+    An `Example`_ is available at the end of this section.
 
-    Notes:
-    ------
-    Extrapolation is not allowed. A NaN value is returned if outside
-    of fluid properties table.
-
-    References:
-    -----------
-    Properties for pure water were taken from p.154 of:
-
-    VDI-Gesellschaft, 2010. VDI Heat Atlas. VDI-Verlag GmbH, Dusseldorf,
-        Germany, Berlin; London.
-
-    Properties for propylene and ethlyne glycol were taken from:
-
-    ASHRAE, 2009. 2009 ASHRAE Handbook - Fundamentals. Si edition ed.,
-        American Society of Heating, Refrigerating and Air-Conditioning
-        Engineers, Atlanta, GA. chap.31, pp. 823-835.
+    .. note::
+        Extrapolation is not allowed when evaluating the
+        thermophysical properties of the fluid.
+        A `nan` value is returned for sets of
+        :attr:`~pygld.HeatCarrierFluid.Tref` and
+        :attr:`~pygld.HeatCarrierFluid.fr` whose values fall outside of the
+        thermophysical properties table of the fluid.
     """
 
     def __init__(self, fluid='water', Tref=20, fr=0):
