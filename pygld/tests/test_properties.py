@@ -54,7 +54,7 @@ def test_properties_of_water():
     for expected_result in expected_results:
         hcfluid.Tref = expected_result[0]
         result = [hcfluid.Tref, hcfluid.Tfp, hcfluid.Tbp, hcfluid.rho,
-                  hcfluid.cp, hcfluid.k, hcfluid.mu, hcfluid.Cp, hcfluid.Pr,
+                  hcfluid.cp, hcfluid.kth, hcfluid.mu, hcfluid.Cp, hcfluid.Pr,
                   hcfluid.nu, hcfluid.al]
         for val, exp_val in zip(result, expected_result):
             if np.isnan(exp_val):
@@ -103,7 +103,7 @@ def test_properties_of_propglycol():
 
     assert hcfluid.rho.tolist() == [1037.89, 1032.55]
     assert hcfluid.cp.tolist() == [3779, 3820]
-    assert hcfluid.k.tolist() == [0.403, 0.421]
+    assert hcfluid.kth.tolist() == [0.403, 0.421]
     assert hcfluid.mu.tolist() == [0.00907, 0.00452]
 
 
@@ -115,7 +115,7 @@ def test_properties_of_ethylglycol():
 
     assert abs(hcfluid.rho - 1053.11) < 10**-6
     assert abs(hcfluid.cp - 3574) < 10**-6
-    assert abs(hcfluid.k - 0.417) < 10**-6
+    assert abs(hcfluid.kth - 0.417) < 10**-6
     assert abs(hcfluid.mu - 0.00503) < 10**-6
 
 
