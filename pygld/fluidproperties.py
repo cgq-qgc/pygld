@@ -182,10 +182,16 @@ class HeatCarrierFluid(object):
         else:
             self._fr = x
 
-    # =========================================================================
+    # ---- Primary dependent properties
 
-    @property                                # Freezing point temperature in °C
+    @property
     def Tfp(self):
+        """Freezing point temperature in °C.
+
+        Return the freezing point temperature of the fluid calculated
+        from a piecewise one-dimensional linear interpolation of the
+        fluid's thermophysical properties table.
+        """
         if self.fluid == 'water':
             return self.__TTP['freez_point']
         else:
@@ -195,10 +201,14 @@ class HeatCarrierFluid(object):
 
             return np.interp(x, xp, yp)
 
-    # =========================================================================
-
-    @property                                 # Boiling point temperature in °C
+    @property
     def Tbp(self):
+        """Boiling point temperature in °C.
+
+        Return the boiling point temperature of the fluid calculated
+        from a piecewise one-dimensional linear interpolation of the
+        fluid's thermophysical properties table.
+        """
         if self.fluid == 'water':
             return self.__TTP['boil_point']
         else:
