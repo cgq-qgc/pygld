@@ -35,11 +35,11 @@ def test_antifreeze_and_fluid_error():
         hcfluid.fr = 2
     assert hcfluid.fr == 0
 
-    hcfluid.fluid = 'prop_glycol'
+    hcfluid.set_fluid('prop_glycol')
     assert hcfluid.fr == 0.3
 
     with pytest.raises(ValueError):
-        hcfluid.fluid = 'test'
+        hcfluid.set_fluid('test')
 
 
 def test_properties_of_water():
