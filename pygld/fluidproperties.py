@@ -6,11 +6,19 @@
 # This is part of PyGLD (Python Ground-Loop Designer).
 # Licensed under the terms of the MIT License.
 
-from __future__ import division, unicode_literals
+# ---- Standard imports
+
+import copy
+
+# ---- Third party imports
 
 import numpy as np
 from scipy import interpolate
 import os
+
+# ---- Local imports
+
+from pygld.utils.strformating import array_to_str
 
 FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
 
@@ -68,7 +76,32 @@ class HeatCarrierFluid(object):
         self.Tref = Tref
         self.fr = fr
 
-    # =========================================================================
+    def __str__(self):
+        str_ = "Type of fluid: %s" % self.fluid
+        str_ += '\nAntifreeze volumetric fraction: %0.2f' % self.fr
+        str_ += '\nFreezing point temperature (°C): %0.1f' % self.Tfp
+        str_ += '\nBoiling point temperature (°C): %0.1f' % self.Tbp
+
+        str_ += '\nTemperature of reference (°C): '
+        str_ += array_to_str(self.Tref, "{:.1f}")
+        str_ += '\nFluid density in (kg/m³): '
+        str_ += array_to_str(self.rho, "{:.2f}")
+        str_ += '\nCinematic viscosity (Pa·s): '
+        str_ += array_to_str(self.mu, "{:.2e}")
+        str_ += '\nThermal conductivity (W/m·k): '
+        str_ += array_to_str(self.kth, "{:.3f}")
+        str_ += '\nSpecific heat capacity (J/kg·K): '
+        str_ += array_to_str(self.cp, "{:.1f}")
+
+        str_ += '\nKynematic viscosity (m²/s): '
+        str_ += array_to_str(self.nu, "{:.2e}")
+        str_ += '\nPrantl number: '
+        str_ += array_to_str(self.Pr, "{:.1f}")
+        str_ += '\nThermal diffusivity (m²/s): '
+        str_ += array_to_str(self.al, "{:.2e}")
+        str_ += '\nVolumetric Heat Capacity (J/m³·K): '
+        str_ += array_to_str(self.Cp, "{:.2e}")
+        return str_
 
     @property                                              # Heat carrier fluid
     def fluid(self):
