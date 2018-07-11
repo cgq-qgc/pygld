@@ -382,5 +382,14 @@ class HeatCarrierFluid(object):
 
 
 if __name__ == '__main__':
-    hcf = HeatCarrierFluid('prop_glycol')
-    print(hcf.rho)
+    hcfluid = HeatCarrierFluid()
+    print(hcfluid)
+
+    print('')
+    print(hcfluid.get_avail_fluid_types())
+    print('')
+
+    hcfluid.set_fluid('prop_glycol')
+    hcfluid.fr = 0.3
+    hcfluid.Tref = [28, 14, 0]
+    print(hcfluid)
