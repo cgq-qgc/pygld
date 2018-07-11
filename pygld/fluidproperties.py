@@ -99,7 +99,6 @@ class HeatCarrierFluid(object):
         str_ += array_to_str(self.Cp, "{:.2e}")
         return str_
 
-    @property                                              # Heat carrier fluid
     # ---- Fluid type and data
 
     @property
@@ -110,6 +109,7 @@ class HeatCarrierFluid(object):
         """
         return copy.copy(self.__TTP)
 
+    @property
     def fluid(self):
         """Return the type of fluid of the heat carrier.
 
@@ -145,30 +145,42 @@ class HeatCarrierFluid(object):
         # TTP: Table of Thermophysical Properties
         self.__TTP = np.load(pathname)
 
+    # ---- Independent properties
 
-    @property                                               # Temperature in °C
+    @property
     def Tref(self):
-        return self.__Tref
+        """Temperature of the fluid in °C.
+
+        Get or set the temperature of the heat carrier fluid as a single value
+        or a series of values stored in a dict, a tuple or a numpy array.
+        A numpy array will always be returned when getting
+        :attr:`~pygld.HeatCarrierFluid.Tref`, independently of the
+        format used to set the attribute.
+        """
+        return np.copy(self._Tref)
 
     @Tref.setter
     def Tref(self, x):
-        self.__Tref = x
+        x = np.array([x]) if not hasattr(x, '__iter__') else np.array(x)
+        self._Tref = x
 
-    # =========================================================================
+    @property
+    def fr(self):
+        """Antifreeze volumetric fraction of the heat carrier fluid in m³/m³
+        (0 ≤ fr ≤ 1).
 
-    @property                                  # antifreeze volumetric fraction
-    def fr(self):                                              # (0 <= fr <= 1)
-        if self.fluid == 'water':
-            return 0
-        else:
-            return self.__fr
+        Get or set the antifreeze volumetric fraction of the heat carrier
+        fluid. The value of `fr` must be between 0 and 1 and is assumed to be
+        0 when :attr:`~pygld.HeatCarrierFluid.fluid` is set to 'water'.
+        """
+        return 0 if self.fluid == 'water' else self._fr
 
     @fr.setter
     def fr(self, x):
         if x > 1 or x < 0:
             raise ValueError('fr must be between 0 and 1 (0 <= fr < 1).')
         else:
-            self.__fr = x
+            self._fr = x
 
     # =========================================================================
 
