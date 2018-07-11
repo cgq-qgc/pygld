@@ -7,7 +7,6 @@ HeatPump class
    :no-members:
    :no-undoc-members:
 
-
 Model and Data
 ---------------------------------
 

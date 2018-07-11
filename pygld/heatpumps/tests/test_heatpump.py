@@ -18,6 +18,7 @@ import numpy as np
 # ---- Local imports
 
 from pygld.heatpumps.heatpump import HeatPump
+from pygld.fluidproperties import FLUIDS
 
 
 def test_heatpump_init():
@@ -200,6 +201,16 @@ def test_get_set_model():
     with pytest.raises(TypeError):
         heatpump.set_model(12.34)
     assert heatpump.model == expected_model
+
+
+def test_avail_fluid_types():
+    """
+    Test that the method to get a list of available heat carrier fluid types
+    is working as expected.
+    """
+    heatpump = HeatPump()
+    assert heatpump.get_avail_fluid_types() == FLUIDS
+    assert id(heatpump.get_avail_fluid_types()) != id(FLUIDS)
 
 
 if __name__ == "__main__":
