@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Copyright © 2018 Jean-Sébastien Gosselin
-# https://github.com/jnsebgosselin/qwatson
+# Copyright © 2017-2018 Jean-Sébastien Gosselin
+# https://github.com/jnsebgosselin/pygld
 #
 # This file is part of PyGLD.
-# Licensed under the terms of the GNU General Public License.
+# Licensed under the terms of the MIT License.
 
 # ---- Standard imports
 

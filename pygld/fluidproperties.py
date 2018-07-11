@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) PyGLD Project Contributors
+# Copyright © 2017-2018 Jean-Sébastien Gosselin
 # https://github.com/jnsebgosselin/pygld
 #
-# This is part of PyGLD (Python Ground-Loop Designer).
+# This file is part of PyGLD.
 # Licensed under the terms of the MIT License.
 
 # ---- Standard imports
