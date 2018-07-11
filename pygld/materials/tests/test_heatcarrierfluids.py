@@ -9,9 +9,7 @@
 
 # ---- Standard imports
 
-import sys
 import os
-
 
 # ---- Third party imports
 
@@ -19,10 +17,9 @@ import numpy as np
 from numpy import nan
 import pytest
 
-
 # ---- Local imports
 
-from pygld.fluidproperties import HeatCarrierFluid
+from pygld import HeatCarrierFluid
 
 
 def test_antifreeze_and_fluid_error():

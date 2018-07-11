@@ -14,10 +14,11 @@ import copy
 
 import numpy as np
 from scipy import interpolate
-import os
+import os.path as osp
 
 # ---- Local imports
 
+from pygld.materials import __datadir__
 from pygld.utils.strformating import array_to_str
 
 FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
@@ -139,8 +140,7 @@ class HeatCarrierFluid(object):
         else:
             raise ValueError('Supported fluid value are', FLUIDS)
 
-        dirname = os.path.dirname(os.path.realpath(__file__))
-        pathname = os.path.join(dirname, 'tables', filename)
+        pathname = osp.join(__datadir__, filename)
 
         # TTP: Table of Thermophysical Properties
         self.__TTP = np.load(pathname)

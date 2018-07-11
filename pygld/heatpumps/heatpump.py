@@ -15,7 +15,7 @@ from scipy.spatial import Delaunay
 
 # ---- Local imports
 
-from pygld.fluidproperties import HeatCarrierFluid
+from pygld import HeatCarrierFluid
 from pygld.heatpumps.utils import load_heatpump_database
 from pygld.heatpumps.maths import eval_polyfid2rd
 from pygld.heatpumps.plots import plot_fitmodel_eval_from
