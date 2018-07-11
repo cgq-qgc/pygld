@@ -100,6 +100,16 @@ class HeatCarrierFluid(object):
         return str_
 
     @property                                              # Heat carrier fluid
+    # ---- Fluid type and data
+
+    @property
+    def hcfdata(self):
+        """
+        Return a `dict` containing the tables of thermophysical properties
+        of the heat carrier :attr:`~pygld.HeatCarrierFluid.fluid`.
+        """
+        return copy.copy(self.__TTP)
+
     def fluid(self):
         """Return the type of fluid of the heat carrier.
 
