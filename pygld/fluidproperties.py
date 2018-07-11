@@ -366,6 +366,10 @@ class HeatCarrierFluid(object):
 
         return z1
 
+    def get_avail_fluid_types(self):
+        """Return a list of all available heat carrier fluid types."""
+        return copy.copy(FLUIDS)
+
 
 if __name__ == '__main__':
     hcf = HeatCarrierFluid('prop_glycol')
