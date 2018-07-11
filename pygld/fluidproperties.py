@@ -208,73 +208,145 @@ class HeatCarrierFluid(object):
 
             return np.interp(x, xp, yp)
 
-    # =========================================================================
-
-    @property                                          # Fluid density in kg/m3
+    @property
     def rho(self):
+        """Fluid density in kg/m³.
+
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the density of the fluid calculated
+        from a piecewise two-dimensional cubic interpolation of the
+        fluid's thermophysical properties table.
+        """
         x = self.__TTP['density'][0]
         y = self.__TTP['density'][1]
         z = self.__TTP['density'][2]
 
-        return self.interp(x, z, y)
+        return self._interp(x, z, y)
 
-    # =========================================================================
-
-    @property                                     # Cinematic viscosity in Pa.s
+    @property
     def mu(self):
+        """Cinematic viscosity in Pa·s.
+
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the cinematic viscosity of the fluid calculated
+        from a piecewise two-dimensional cubic interpolation of the
+        fluid's thermophysical properties table.
+        """
         x = self.__TTP['viscosity'][0]
         y = self.__TTP['viscosity'][1]
         z = self.__TTP['viscosity'][2]/1000
 
-        return self.interp(x, z, y)
+        return self._interp(x, z, y)
 
-    # =========================================================================
+    @property
+    def kth(self):
+        """Thermal conductivity in W/(m·k).
 
-    @property                                 # Thermal conductivity in W/(m·k)
-    def k(self):
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the thermal conductivity of the fluid calculated
+        from a piecewise two-dimensional cubic interpolation of the
+        fluid's thermophysical properties table.
+        """
         x = self.__TTP['ther_cond'][0]
         y = self.__TTP['ther_cond'][1]
         z = self.__TTP['ther_cond'][2]
 
-        return self.interp(x, z, y)
+        return self._interp(x, z, y)
 
-    # =========================================================================
-
-    @property                              # Specific Heat Capacity in J/(kg·K)
+    @property
     def cp(self):
+        """Specific heat capacity in J/(kg·K)
+
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the specific heat capacity of the fluid calculated
+        from a two dimensional piecewise cubic interpolation of the
+        fluid's thermophysical properties table.
+        """
         x = self.__TTP['spec_heat'][0]
         y = self.__TTP['spec_heat'][1]
         z = self.__TTP['spec_heat'][2]*1000
 
-        return self.interp(x, z, y)
+        return self._interp(x, z, y)
 
-    # =========================================================================
+    # ---- Derived dependent properties
 
-    @property                                     # Kynematic viscosity in m²/s
+    @property
     def nu(self):
+        """Kynematic viscosity in m²/s.
+
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the kynematic viscosity of the fluid calculated as:
+
+        .. math::
+            nu[i] = mu[i] \\, / \\, rho[i]
+
+        where :math:`i` is the index at which :math:`nu` is computed,
+        :math:`mu` is the cinematic viscosity in Pa·s,
+        and :math:`rho` is the density of the fluid in kg/m³.
+        """
         return self.mu/self.rho
 
-    # =========================================================================
-
-    @property                                                   # Prantl number
+    @property
     def Pr(self):
-        return self.mu * self.cp / self.k
+        """Prantl number.
 
-    # =========================================================================
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the Prantl number of the fluid calculated as:
 
-    @property                                     # Thermal diffusivity in m²/s
+        .. math::
+            Pr[i] = \\frac{mu[i]}{cp[i] \\cdot kth[i]}
+
+        where :math:`i` is the index at which :math:`Pr` is computed,
+        :math:`mu` is the cinematic viscosity in Pa·s,
+        :math:`cp` is the specific heat capacity in J/(kg·K),
+        and :math:`kth` is the thermal conductivity in W/(m·k).
+        """
+        return self.mu * self.cp / self.kth
+
+    @property
     def al(self):
-        return self.k / (self.cp * self.rho)
+        """Thermal diffusivity in m²/s.
 
-    # =========================================================================
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the thermal diffusivity of the fluid calculated as:
 
-    @property                            # Volumetric Heat Capacity in J/(m3.K)
+        .. math::
+            al[i] = \\frac{kth[i]}{cp[i] \\cdot rho[i]}
+
+        where :math:`i` is the index at which :math:`al` is computed,
+        :math:`kth` is the thermal conductivity in W/(m·k),
+        :math:`cp` is the specific heat capacity in J/(kg·K),
+        and :math:`rho` is the density of the fluid in kg/m³.
+        """
+        return self.kth / (self.cp * self.rho)
+
+    @property
     def Cp(self):
+        """Volumetric Heat Capacity in J/(m³·K).
+
+        Return a numpy array of a length that match that of
+        :attr:`~pygld.HeatCarrierFluid.Tref` containing the values
+        for the volumetric heat capacity of the fluid calculated as:
+
+        .. math::
+            Cp[i] = cp[i] \\cdot rho[i]
+
+        where :math:`i` is the index at which :math:`Cp` is computed,
+        :math:`cp` is the specific heat capacity in J/(kg·K),
+        and :math:`rho` is the density of the fluid in kg/m³.
+        """
         return self.cp * self.rho
 
-    # =========================================================================
+    # ---- Calculs
 
-    def interp(self, x, z, y=None):
+    def _interp(self, x, z, y=None):
         """
         Interpolate a value from table for aqueous solutions and pure water
         x is temperature
