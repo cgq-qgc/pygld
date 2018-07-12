@@ -7,6 +7,6 @@
 # Licensed under the terms of the GNU General Public License.
 
 """
-This is an object-oriented plotting library for designing coupled 
+This is an object-oriented plotting library for designing coupled
 ground-loop heat exchanger.
 """
