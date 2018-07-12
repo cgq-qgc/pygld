@@ -59,6 +59,4 @@ else:
     __rootdir__ = os.path.dirname(os.path.realpath(__file__))
 
 from pygld.api.materials.heatcarrierfluids import HeatCarrierFluid
-from pygld.api.materials.pipes import Pipe
 from pygld.api.heatpumps.heatpump import HeatPump
-from pygld.api.boreholes import Borehole
