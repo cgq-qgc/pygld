@@ -17,8 +17,8 @@ import numpy as np
 
 # ---- Local imports
 
-from pygld.heatpumps.heatpump import HeatPump
-from pygld.materials.heatcarrierfluids import FLUIDS
+from pygld import HeatPump
+from pygld.api.materials.heatcarrierfluids import FLUIDS
 
 
 def test_heatpump_init():

@@ -19,8 +19,8 @@ import numpy as np
 
 # ---- Local imports
 
-from pygld.heatpumps import __datadir__
-from pygld.heatpumps.maths import multi_polyfit2rd
+from .__init__ import __datadir__
+from .maths import multi_polyfit2rd
 
 
 def load_heatpump_database(dirname=None):

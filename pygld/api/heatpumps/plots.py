@@ -16,8 +16,8 @@ from matplotlib.ticker import MaxNLocator
 
 # ---- Local imports
 
-from pygld.heatpumps.utils import load_heatpump_database
-from pygld.heatpumps.maths import eval_polyfid2rd
+from .utils import load_heatpump_database
+from .maths import eval_polyfid2rd
 
 
 def plot_fitmodel_eval_from(hpdata):
