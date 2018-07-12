@@ -17,9 +17,9 @@ import pytest
 
 # ---- Local imports
 
-from pygld.heatpumps.utils import build_heatpump_database
+from pygld.api.heatpumps.utils import build_heatpump_database
 from pygld.utils.fileio import delete_file_safely
-from pygld.heatpumps import __datadir__
+from pygld.api.heatpumps import __datadir__
 
 
 def test_build_database():
