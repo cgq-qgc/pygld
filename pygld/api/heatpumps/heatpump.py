@@ -16,9 +16,9 @@ from scipy.spatial import Delaunay
 # ---- Local imports
 
 from pygld import HeatCarrierFluid
-from pygld.heatpumps.utils import load_heatpump_database
-from pygld.heatpumps.maths import eval_polyfid2rd
-from pygld.heatpumps.plots import plot_fitmodel_eval_from
+from .utils import load_heatpump_database
+from .maths import eval_polyfid2rd
+from .plots import plot_fitmodel_eval_from
 
 tbl_fluid0 = {}
 tbl_fluid0['name'] = 'water'
@@ -61,8 +61,8 @@ corrtbl_afreeze[tbl_fluid2['name']] = tbl_fluid2
 
 class HeatPump(object):
     """
-    The :attr:`~pygld.HeatPump` holds all the properties and handles all the
-    calculation and modelling related to a single heatpump coupled to a
+    The :attr:`~pygld.HeatPump` class holds all the properties and handles all
+    the calculation and modelling related to a single heatpump coupled to a
     ground-loop heat exchanger system.
 
     An `Example`_ is available at the end of this section.

@@ -18,7 +18,7 @@ import os.path as osp
 
 # ---- Local imports
 
-from pygld.materials import __datadir__
+from .__init__ import __datadir__
 from pygld.utils.strformating import array_to_str
 
 FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
@@ -26,7 +26,7 @@ FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
 
 class HeatCarrierFluid(object):
     """
-    The :attr:`~pygld.HeatCarrierFluid` holds all the thermophysical
+    The :attr:`~pygld.HeatCarrierFluid` class holds all the thermophysical
     properties related to the fluid circulating in the ground-loop of the
     heat exchanger system. The :attr:`~pygld.HeatCarrierFluid` is initialized
     by default as a pure water :attr:`~pygld.HeatCarrierFluid.fluid` with an

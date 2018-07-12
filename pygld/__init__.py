@@ -58,5 +58,5 @@ if is_frozen():
 else:
     __rootdir__ = os.path.dirname(os.path.realpath(__file__))
 
-from pygld.materials.heatcarrierfluids import HeatCarrierFluid
-from pygld.heatpumps.heatpump import HeatPump
+from pygld.api.materials.heatcarrierfluids import HeatCarrierFluid
+from pygld.api.heatpumps.heatpump import HeatPump
