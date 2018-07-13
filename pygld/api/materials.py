@@ -227,7 +227,7 @@ class GroutMaterial(BaseMaterial):
     @classmethod
     def init_as(cls, material):
         """
-        Initializes the thermal properties of the :class:`GroutMaterial`
+        Initialize the thermal properties of the :class:`GroutMaterial`
         based on the specified material index.
         The methods :meth:`~GroutMaterial.print_predefined_materials` and
         :meth:`~GroutMaterial.get_predefined_materials` can be used to,
@@ -255,7 +255,7 @@ class PipeMaterial(BaseMaterial):
     @classmethod
     def init_as(cls, material):
         """
-        Initializes the thermal properties of the :class:`PipeMaterial`
+        Initialize the thermal properties of the :class:`PipeMaterial`
         based on the specified material index.
         The methods :meth:`~PipeMaterial.print_predefined_materials` and
         :meth:`~PipeMaterial.get_predefined_materials` can be used to,
@@ -283,7 +283,7 @@ class GroundMaterial(BaseMaterial):
     @classmethod
     def init_as(cls, material):
         """
-        Initializes the thermal properties of the :class:`GroundMaterial`
+        Initialize the thermal properties of the :class:`GroundMaterial`
         based on the specified material index.
         The methods :meth:`~GroundMaterial.print_predefined_materials` and
         :meth:`~GroundMaterial.get_predefined_materials` can be used to,
