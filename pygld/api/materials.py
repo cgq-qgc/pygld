@@ -214,6 +214,10 @@ class BaseMaterial(object):
 
 class GroutMaterial(BaseMaterial):
 
+    def __init__(self, kth=None, Cp=None):
+        super().__init__(kth, Cp)
+        self._category = BaseMaterial.Grout
+
     @classmethod
     def get_predefined_materials(cls):
         """Return a dict containing the predefined :class:`GroutMaterial`."""
@@ -242,6 +246,10 @@ class GroutMaterial(BaseMaterial):
 
 class PipeMaterial(BaseMaterial):
 
+    def __init__(self, kth=None, Cp=None):
+        super().__init__(kth, Cp)
+        self._category = BaseMaterial.Pipe
+
     @classmethod
     def get_predefined_materials(cls):
         """Return a dict containing the predefined :class:`PipeMaterial`."""
@@ -269,6 +277,10 @@ class PipeMaterial(BaseMaterial):
 
 
 class GroundMaterial(BaseMaterial):
+
+    def __init__(self, kth=None, Cp=None):
+        super().__init__(kth, Cp)
+        self._category = BaseMaterial.Ground
 
     @classmethod
     def get_predefined_materials(cls):
