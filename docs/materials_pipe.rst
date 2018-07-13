@@ -35,7 +35,7 @@ Import and print the list of predefined :class:`~pygld.PipeMaterial`::
 Initialize :class:`~pygld.PipeMaterial` from the predefined material at index
 #1 and print the results::
 
-    >>> pipe = PipeMaterial.ini_from(1)
+    >>> pipe = PipeMaterial.init_as(1)
     >>> print(pipe)
     Pipe material: Geoperformx
     Thermal conductivity: 0.700 W/m·k

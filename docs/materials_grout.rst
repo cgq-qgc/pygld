@@ -36,7 +36,7 @@ Import and print the list of predefined :class:`~pygld.GroutMaterial`::
 Initialize :class:`~pygld.GroutMaterial` from the predefined material at index
 #1 and print the results::
 
-    >>> grout = GroundMaterial.ini_from(1)
+    >>> grout = GroundMaterial.init_as(1)
     >>> print(grout)
     Grout material: Bentonite/Sand 12%/15%
     Thermal conductivity: 1.500 W/m·k

@@ -93,7 +93,7 @@ Import and print the list of predefined :class:`~pygld.GroundMaterial`::
 Initialize :class:`~pygld.GroundMaterial` from the predefined material at index
 #14 and print the results::
 
-    >>> ground = GroundMaterial.ini_from(14)
+    >>> ground = GroundMaterial.init_as(14)
     >>> print(ground)
     Ground material: Dolomite
     Thermal conductivity: 3.200 W/m·k
