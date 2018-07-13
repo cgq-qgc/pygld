@@ -202,7 +202,7 @@ class BaseMaterial(object):
         This is a convenience function; the member variables can also be
         initialized manually.
         """
-        predefmats = cls.get_predefined_materials(category)
+        predefmats = PREDEFINED_MATERIALS.get(category, None)
         material = (list(predefmats.keys())[material] if
                     isinstance(material, int) else material)
 
@@ -298,20 +298,16 @@ class GroundMaterial(BaseMaterial):
 
 if __name__ == '__main__':
     GroutMaterial.print_predefined_materials(end='\n\n')
+    grout = GroutMaterial.init_as(1)
+    print(grout, end='\n\n')
+
     PipeMaterial.print_predefined_materials(end='\n\n')
-    GroundMaterial.print_predefined_materials()
-    
-    # grout = Material.init_as(Material.Grout, 1)
-    # print(grout, end='\n'*2)
+    pipe = PipeMaterial.init_as(0)
+    print(pipe, end='\n\n')
 
-    # pipe = Material.init_as(Material.Pipe, 0)
-    # print(pipe, end='\n'*2)
+    GroundMaterial.print_predefined_materials(end='\n\n')
+    ground = GroundMaterial.init_as(14)
+    print(ground, end='\n\n')
 
-    # ground = Material.init_as(Material.Ground, 14)
-    # print(ground, end='\n'*2)
-
-    # ground.kth = 4
-    # print(ground, end='\n'*2)
-
-    # custom = Material()
-    # print(custom, end='\n'*2)
+    ground.kth = 4
+    print(ground, end='\n\n')
