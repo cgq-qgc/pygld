@@ -1,4 +1,4 @@
-GroutMaterial class
+Grout Material
 ---------------------------------
 
 .. currentmodule:: pygld

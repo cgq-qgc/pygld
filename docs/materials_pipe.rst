@@ -1,4 +1,4 @@
-PipeMaterial class
+Pipe Material
 ---------------------------------
 
 .. currentmodule:: pygld

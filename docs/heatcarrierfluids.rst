@@ -1,4 +1,4 @@
-HeatCarrierFluid class
+Heat Carrier Fluid
 ======================
 
 .. currentmodule:: pygld

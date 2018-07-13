@@ -1,4 +1,4 @@
-GroundMaterial class
+Ground Material
 ---------------------------------
 
 .. currentmodule:: pygld

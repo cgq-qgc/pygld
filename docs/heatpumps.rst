@@ -1,4 +1,4 @@
-HeatPump class
+Heat Pump
 ==================
 
 .. currentmodule:: pygld
