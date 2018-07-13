@@ -172,15 +172,21 @@ def linkcode_resolve(domain, info):
         return None
     if not info['module']:
         return None
+
     filename = "https://github.com/jnsebgosselin/pygld/tree/master/pygld"
     if info['fullname'] == 'HeatPump':
-        filename += '/heatpumps/heatpump.py'
-        return filename
+        filename += '/api/heatpumps/heatpump.py'
     elif info['fullname'] == 'HeatCarrierFluid':
-        filename += '/fluidproperties.py'
-        return filename
+        filename += '/api/heatcarrierfluids.py'
+    elif info['fullname'] == 'GroutMaterial':
+        filename += '/api/materials.py#L216'
+    elif info['fullname'] == 'GroutMaterial':
+        filename += '/api/materials.py#L300'
+    elif info['fullname'] == 'PipeMaterial':
+        filename += '/api/materials.py#L258'
     else:
-        return None
+        filename = None
+    return filename
 
 
 # Additional stuff for the LaTeX preamble.
