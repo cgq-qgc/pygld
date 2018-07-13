@@ -90,6 +90,10 @@ PREDEFINED_MATERIALS = OrderedDict({
 
 
 class BaseMaterial(object):
+    """
+    This is the base class from which all other ground-loop heat exchanger
+    materials should derived.
+    """
     Grout = 'Grout'
     Pipe = 'Pipe'
     Ground = 'Ground'
@@ -195,9 +199,6 @@ class BaseMaterial(object):
         """
         Initializes the thermal properties based on the specified
         category and material. The material can be either a str or an index.
-        The list of predefined categories and materials can be printed with the
-        `Material.print_predefined_materials` method. If no argument is
-        provided, the materials will be printed for all available categories.
 
         This is a convenience function; the member variables can also be
         initialized manually.
@@ -213,6 +214,20 @@ class BaseMaterial(object):
 
 
 class GroutMaterial(BaseMaterial):
+    """
+    The :class:`GroutMaterial` class holds all the thermophysical properties
+    relative to the grout that are required for the modeling of ground-loop
+    heat exchanger systems.
+
+    A database of predefined grout materials is available and can be obtained
+    or printed with the :meth:`~GroutMaterial.get_predefined_materials` and
+    :meth:`~GroutMaterial.print_predefined_materials` methods.
+    The :class:`GroutMaterial` can be initialized directly from a predefined
+    material with the :meth:`~GroutMaterial.init_as`, passing as argument the
+    index of the material in the database.
+
+    An `Example`_ is available at the end of this section.
+    """
 
     def __init__(self, kth=None, Cp=None):
         super().__init__(kth, Cp)
@@ -233,10 +248,6 @@ class GroutMaterial(BaseMaterial):
         """
         Initialize the thermal properties of the :class:`GroutMaterial`
         based on the specified material index.
-        The methods :meth:`~GroutMaterial.print_predefined_materials` and
-        :meth:`~GroutMaterial.get_predefined_materials` can be used to,
-        respectively, print or get in a dict the predefined
-        :class:`GroutMaterial` that are availables.
 
         This is a convenience function; the member variables can also be
         initialized manually.
@@ -245,6 +256,20 @@ class GroutMaterial(BaseMaterial):
 
 
 class PipeMaterial(BaseMaterial):
+    """
+    The :class:`PipeMaterial` class holds all the thermophysical properties
+    relative to the pipes that are required for the modeling of ground-loop
+    heat exchanger systems.
+
+    A database of predefined pipe materials is available and can be obtained
+    or printed with the :meth:`~PipeMaterial.get_predefined_materials` and
+    :meth:`~PipeMaterial.print_predefined_materials` methods.
+    The :class:`PipeMaterial` can be initialized directly from a predefined
+    material with the :meth:`~PipeMaterial.init_as`, passing as argument the
+    index of the material in the database.
+
+    An `Example`_ is available at the end of this section.
+    """
 
     def __init__(self, kth=None, Cp=None):
         super().__init__(kth, Cp)
@@ -265,10 +290,6 @@ class PipeMaterial(BaseMaterial):
         """
         Initialize the thermal properties of the :class:`PipeMaterial`
         based on the specified material index.
-        The methods :meth:`~PipeMaterial.print_predefined_materials` and
-        :meth:`~PipeMaterial.get_predefined_materials` can be used to,
-        respectively, print or get in a dict the predefined
-        :class:`PipeMaterial` that are availables.
 
         This is a convenience function; the member variables can also be
         initialized manually.
@@ -277,6 +298,20 @@ class PipeMaterial(BaseMaterial):
 
 
 class GroundMaterial(BaseMaterial):
+    """
+    The :class:`GroundMaterial` class holds all the thermophysical properties
+    relative to the ground that are required for the modeling of ground-loop
+    heat exchanger systems.
+
+    A database of predefined ground materials is available and can be obtained
+    or printed with the :meth:`~GroundMaterial.get_predefined_materials` and
+    :meth:`~GroundMaterial.print_predefined_materials` methods.
+    The :class:`GroundMaterial` can be initialized directly from a predefined
+    material with the :meth:`~GroundMaterial.init_as`, passing as argument the
+    index of the material in the database.
+
+    An `Example`_ is available at the end of this section.
+    """
 
     def __init__(self, kth=None, Cp=None):
         super().__init__(kth, Cp)
@@ -297,10 +332,6 @@ class GroundMaterial(BaseMaterial):
         """
         Initialize the thermal properties of the :class:`GroundMaterial`
         based on the specified material index.
-        The methods :meth:`~GroundMaterial.print_predefined_materials` and
-        :meth:`~GroundMaterial.get_predefined_materials` can be used to,
-        respectively, print or get in a dict the predefined
-        :class:`GroundMaterial` that are availables.
 
         This is a convenience function; the member variables can also be
         initialized manually.
