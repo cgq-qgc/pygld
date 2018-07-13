@@ -195,21 +195,25 @@ class BaseMaterial(object):
         print(str_, end=end)
 
     @classmethod
-    def init_as(cls, category, material):
+    def init_as(cls, category_name, material_index):
         """
         Initializes the thermal properties based on the specified
-        category and material. The material can be either a str or an index.
+        category and material index.
 
         This is a convenience function; the member variables can also be
         initialized manually.
         """
-        predefmats = PREDEFINED_MATERIALS.get(category, None)
-        material = (list(predefmats.keys())[material] if
-                    isinstance(material, int) else material)
+        predefmats = PREDEFINED_MATERIALS.get(category_name, None)
 
-        instance = cls(*predefmats[material])
-        instance._material = material
-        instance._category = category
+        material_names = list(predefmats.keys())
+
+        # Ensure there is no IndexError when accessing the material database.
+        material_index = min(max(material_index, 0), len(material_names)-1)
+        material_name = material_names[material_index]
+
+        instance = cls(*predefmats[material_name])
+        instance._material = material_name
+        instance._category = category_name
         return instance
 
 
@@ -244,7 +248,7 @@ class GroutMaterial(BaseMaterial):
         super().print_predefined_materials(BaseMaterial.Grout, end)
 
     @classmethod
-    def init_as(cls, material):
+    def init_as(cls, material_index):
         """
         Initialize the thermal properties of the :class:`GroutMaterial`
         based on the specified material index.
@@ -252,7 +256,7 @@ class GroutMaterial(BaseMaterial):
         This is a convenience function; the member variables can also be
         initialized manually.
         """
-        return super().init_as(BaseMaterial.Grout, material)
+        return super().init_as(BaseMaterial.Grout, material_index)
 
 
 class PipeMaterial(BaseMaterial):
@@ -286,7 +290,7 @@ class PipeMaterial(BaseMaterial):
         super().print_predefined_materials(BaseMaterial.Pipe, end)
 
     @classmethod
-    def init_as(cls, material):
+    def init_as(cls, material_index):
         """
         Initialize the thermal properties of the :class:`PipeMaterial`
         based on the specified material index.
@@ -294,7 +298,7 @@ class PipeMaterial(BaseMaterial):
         This is a convenience function; the member variables can also be
         initialized manually.
         """
-        return super().init_as(BaseMaterial.Pipe, material)
+        return super().init_as(BaseMaterial.Pipe, material_index)
 
 
 class GroundMaterial(BaseMaterial):
@@ -328,7 +332,7 @@ class GroundMaterial(BaseMaterial):
         super().print_predefined_materials(BaseMaterial.Ground, end)
 
     @classmethod
-    def init_as(cls, material):
+    def init_as(cls, material_index):
         """
         Initialize the thermal properties of the :class:`GroundMaterial`
         based on the specified material index.
@@ -336,10 +340,12 @@ class GroundMaterial(BaseMaterial):
         This is a convenience function; the member variables can also be
         initialized manually.
         """
-        return super().init_as(BaseMaterial.Ground, material)
+        return super().init_as(BaseMaterial.Ground, material_index)
 
 
 if __name__ == '__main__':
+    grout = GroutMaterial.init_as(28)
+
     # ---- Example Grout
 
     GroutMaterial.print_predefined_materials(end='\n\n')
