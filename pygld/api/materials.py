@@ -297,17 +297,46 @@ class GroundMaterial(BaseMaterial):
 
 
 if __name__ == '__main__':
+    # ---- Example Grout
+
     GroutMaterial.print_predefined_materials(end='\n\n')
+
     grout = GroutMaterial.init_as(1)
     print(grout, end='\n\n')
 
-    PipeMaterial.print_predefined_materials(end='\n\n')
-    pipe = PipeMaterial.init_as(0)
-    print(pipe, end='\n\n')
+    grout.kth = 1.75
+    print(grout, end='\n\n')
+
+    grout = GroutMaterial()
+    grout.kth = 2
+    grout.Cp = 3500
+    print(grout, end='\n\n')
+
+    # ---- Example Ground
 
     GroundMaterial.print_predefined_materials(end='\n\n')
+
     ground = GroundMaterial.init_as(14)
     print(ground, end='\n\n')
 
-    ground.kth = 4
+    ground.kth = 3.35
     print(ground, end='\n\n')
+
+    ground = GroundMaterial()
+    ground.kth = 2.27
+    ground.Cp = 3278
+    print(ground, end='\n\n')
+
+    # ---- Example Pipe
+
+    PipeMaterial.print_predefined_materials(end='\n\n')
+    pipe = PipeMaterial.init_as(1)
+    print(pipe, end='\n\n')
+
+    pipe.kth = 0.67
+    print(pipe, end='\n\n')
+
+    pipe = PipeMaterial()
+    pipe.kth = 0.53
+    pipe.Cp = 1767
+    print(pipe)
