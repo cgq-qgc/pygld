@@ -112,7 +112,7 @@ Change the thermal conductivity for another value and print the results::
 Note that the ground material is now labeled as 'User defined'.
 
 It is also possible to initialize an empty :class:`~pygld.GroundMaterial` and
-set the property values manually::
+set the value of the properties manually::
 
     >>> ground = GroundMaterial()
     >>> ground.kth = 2.27

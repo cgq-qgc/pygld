@@ -55,7 +55,7 @@ Change the thermal conductivity for another value and print the results::
 Note that the grout material is now labeled as 'User defined'.
 
 It is also possible to initialize an empty :class:`~pygld.GroutMaterial` and
-set the property values manually::
+set the value of the properties manually::
 
     >>> grout = GroutMaterial()
     >>> grout.kth = 2
