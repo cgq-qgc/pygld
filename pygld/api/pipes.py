@@ -45,7 +45,7 @@ class Pipe(object):
         self._do = do
 
         material = PipeMaterial.init_as(0) if material is None else material
-        self.set_material(PipeMaterial.init_as(0))
+        self.set_material(material)
 
     def __str__(self):
         str_ = 'Inner diameter: %0.2f cm' % (self.di)
