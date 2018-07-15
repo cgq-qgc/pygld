@@ -41,9 +41,7 @@ class Pipe(object):
     An `Example`_ is available at the end of this section.
     """
     def __init__(self, di, do, material=None):
-        self._di = di
-        self._do = do
-
+        self.di, self.do = di, do
         material = PipeMaterial.init_as(0) if material is None else material
         self.set_material(material)
 
@@ -61,26 +59,29 @@ class Pipe(object):
 
     @property
     def di(self):
-        """Get or set the inner diameter of the pipe in cm."""
+        """Inner diameter of the pipe in cm.
+
+        Get or set the inner diameter of the pipe as a single positive
+        float value.
+        """
         return self._di
 
     @di.setter
     def di(self, x):
-        return self._di
+        self._di = None if x is None else abs(float(x))
 
     @property
     def do(self):
-        """Get or set the outer diameter of the pipe in cm."""
+        """Outer diameter of the pipe in cm.
+
+        Get or set the outer diameter of the pipe as a single positive
+        float value.
+        """
         return self._do
 
     @do.setter
     def do(self, x):
-        return self._do
-
-    @property
-    def do(self):
-        """Get or set the outer diameter of the pipe in cm."""
-        return self._do
+        self._do = None if x is None else abs(float(x))
 
     @property
     def wt(self):

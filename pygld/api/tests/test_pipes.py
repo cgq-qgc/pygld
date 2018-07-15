@@ -80,6 +80,14 @@ def test_set_material():
     assert pipe.material._category == 'Pipe'
     assert pipe.material._material == 'HDPE'
 
+    # Assert that an error is raised when passing a wrong value
+    # to set_material.
+
+    with pytest.raises(TypeError):
+        pipe.set_material('dummy')
+    assert pipe.material._category == 'Pipe'
+    assert pipe.material._material == 'HDPE'
+
     # Assert that the material thermal properties are set correctly.
 
     pipe.material.kth = 0.63
