@@ -47,6 +47,20 @@ Utilities
 
 .. automethod:: pygld.HeatCarrierFluid.get_avail_fluid_types
 
+References
+---------------------------------
+
+Properties for pure water were taken from p.154 of:
+
+VDI-Gesellschaft, 2010. VDI Heat Atlas. VDI-Verlag GmbH, Dusseldorf,
+    Germany, Berlin; London.
+
+Properties for propylene and ethlyne glycol were taken from:
+
+ASHRAE, 2009. 2009 ASHRAE Handbook - Fundamentals. Si edition ed.,
+    American Society of Heating, Refrigerating and Air-Conditioning
+    Engineers, Atlanta, GA. chap.31, pp. 823-835.
+
 Example
 ---------------------------------
 
@@ -96,18 +110,3 @@ values and print a summary of the fluid's updated properties::
     Prantl number: [20.6, 34.7, 65.6]
     Thermal diffusivity (m²/s): [1.11e-07, 1.08e-07, 1.04e-07]
     Volumetric Heat Capacity (J/m³·K): [3.97e+06, 3.95e+06, 3.93e+06]
-
-
-References
----------------------------------
-
-Properties for pure water were taken from p.154 of:
-
-VDI-Gesellschaft, 2010. VDI Heat Atlas. VDI-Verlag GmbH, Dusseldorf,
-    Germany, Berlin; London.
-
-Properties for propylene and ethlyne glycol were taken from:
-
-ASHRAE, 2009. 2009 ASHRAE Handbook - Fundamentals. Si edition ed.,
-American Society of Heating, Refrigerating and Air-Conditioning
-Engineers, Atlanta, GA. chap.31, pp. 823-835.
