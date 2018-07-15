@@ -143,7 +143,7 @@ class Pipe(object):
         calculated as:
 
         .. math::
-            Rcond = \\frac{log(do/di)}{2 \\cdot \\pi \\cdot kth}
+            Rcond = \\frac{ln(do/di)}{2 \\cdot \\pi \\cdot kth}
 
         where :math:`di` and :math:`do` are, repectively, the inner and outer
         diameter of the pipe in m and :math:`kth` is its thermal conductivity
