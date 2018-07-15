@@ -61,3 +61,4 @@ else:
 from pygld.api.heatcarrierfluids import HeatCarrierFluid
 from pygld.api.heatpumps.heatpump import HeatPump
 from pygld.api.materials import GroutMaterial, PipeMaterial, GroundMaterial
+from pygld.api.pipes import Pipe
