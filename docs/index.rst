@@ -5,3 +5,4 @@ PyGLD Documentation
    heatcarrierfluids
    heatpumps
    materials
+   pipes

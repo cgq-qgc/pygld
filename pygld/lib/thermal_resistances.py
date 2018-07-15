@@ -269,6 +269,11 @@ def calcul_Rcond_pipe(kp, ri, ro):
     ri = inner radius of the pipe in m
     ro = outer radius of the pipe in m
     Rcond = conductive thermal resistance in m.K/W
+
+    Reference:
+        Hellström, G. 1991. Ground Heat Storage - Thermal Analyses of Duct
+        Storage Systems. Ph.D. thesis. University of Lund. Department
+        of mathematical physics, Lund, Sweden. Eq.8.2, p.75.
     """
     return np.log(ro/ri) / (2*pi*kp)
 
@@ -618,8 +623,6 @@ def calcul_Rb_multipoles(kb, ks, rb, rp, Rp, Jp, z):
 #    R2b = 1/K2b
 #    R2b = R1b
 #    Raj = R12 * (R1b+R2b) / (R1b+R2b+R12)
-    #print(K1b, K12, K2b)
-    #print(Raj-Ra)
 
 #    Ka = (2*K[0, 0] + K[1, 1] + K[0, 1]) / (K[0, 1]*)
 
@@ -698,7 +701,7 @@ if __name__ == '__main__':
 
     # conductive thermal resistance :
 
-    Rcond =  np.log(ro/ri)/(2*pi*kp)
+    Rcond = np.log(ro/ri)/(2*pi*kp)
     print('Rcond =', Rcond)
 
     # convective thermal resistance :
