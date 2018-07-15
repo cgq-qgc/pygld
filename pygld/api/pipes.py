@@ -22,22 +22,21 @@ class Pipe(object):
     """
     The :attr:`~pygld.Pipe` class holds the geometry and material properties
     of the pipes used in the construction of ground-loop heat exchangers.
-    The thermophysical properties of the pipe's material are held in a
-    :class:`~pygld.PipeMaterial` object that can be accessed with the
-    :attr:`.material` property.
-
     The inner and outer diameters of the pipe in cm must be passed as arguments
-    when instantiating :attr:`~pygld.Pipe`. These values can aftward be
+    when instantiating :attr:`~pygld.Pipe`. These values can afterward be
     accessed or changed with the :attr:`.di` and :attr:`.do` properties
 
-    The optional argument 'material' can be used to pass a
-    :class:`~pygld.PipeMaterial` when instantiating :attr:`~pygld.Pipe`.
-    The pipe's :attr:`.material` can also be set a posteriori with
-    :meth:`.set_material`.
+    The thermophysical properties of the pipe are held in a
+    :class:`~pygld.PipeMaterial` object that can be accessed with the
+    :attr:`.material` property or set with :meth:`.set_material`.
+    The optional argument 'material' can be used to pass a custom
+    :class:`~pygld.PipeMaterial` when instantiating a :attr:`~pygld.Pipe`.
     If no :class:`~pygld.PipeMaterial` is provided when instantiating
     :attr:`~pygld.Pipe`, the pipe's :attr:`.material` will be set to that of
     a standard HDPE pipe by default, with a thermal conductivity of 0.4 W/m·k
-    and a volumetric heat capacity of 1500 J/m³·K.
+    and a volumetric heat capacity of 1500 J/m³·K. These values can be changed
+    afterward by setting directly the properties :attr:`PipeMaterial.kth` and
+    :attr:`PipeMaterial.Cp` of the pipe's :attr:`.material`.
 
     An `Example`_ is available at the end of this section.
     """
@@ -156,3 +155,7 @@ class Pipe(object):
 if __name__ == '__main__':
     pipe = Pipe(di=3.39852, do=4.2164)
     print(pipe)
+
+    pipe.material.kth = 0.43
+    pipe.material.Cp = 1540
+    print(pipe.material)
