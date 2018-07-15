@@ -18,3 +18,8 @@ script:
 
 after_success:
   - codecov
+
+# safelist
+branches:
+  only:
+  - master
