@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-
+# -----------------------------------------------------------------------------
 # Copyright (c) PyGLD Project Contributors
-# https://github.com/jnsebgosselin/pygld
+# https://github.com/cgq-qgc/pygld
 #
 # This is part of PyGLD (Python Ground-Loop Designer).
 # Licensed under the terms of the MIT License.
+# -----------------------------------------------------------------------------
 
 
 # ---- Third party imports
@@ -12,12 +13,9 @@ import numpy as np
 from numpy import pi
 import pytest
 
-
 # ---- Local imports
 from pygld.lib.thermal_resistances import calcul_Rb_multipoles
 
-
-# ---- Test calcul_Rb_multipoles
 
 def test_multipole_with_claesson_2011():
     """
