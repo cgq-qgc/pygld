@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-
+# -----------------------------------------------------------------------------
 # Copyright (c) PyGLD Project Contributors
-# https://github.com/jnsebgosselin/pygld
+# https://github.com/cgq-qgc/pygld
 #
 # This is part of PyGLD (Python Ground-Loop Designer).
 # Licensed under the terms of the MIT License.
+# -----------------------------------------------------------------------------
 
 import numpy as np
 from numpy import (pi, log, conj, zeros, diag)
 
 
 # ---- Head Loss in Pipes
-
 def calcul_dp_pipe(V, di, rho, mu):
     """
     Calcul the hydraulic head loss per unit of length in a circular pipe.
@@ -85,8 +85,6 @@ def calcul_dp_ann(V, d1, d2, rho, mu):
 
 
 # ---- Nusselt Number
-
-
 def calcul_Nu_pipe(Re, Pr):
     """
     Compute mean Nusselt number for a flow in a circular pipe.
@@ -218,7 +216,6 @@ def calcul_Nu_annulus2(Re, Pr, a):
 
 
 # ---- Pipes Thermal Resistance
-
 def calcul_Rconv_pipe(ri, Vf, muf, kf, rhof, Pr):
     """
     Compute the convective thermal resistance in a tube.
@@ -308,7 +305,6 @@ def calcul_Rp(kp, rpi, rpo, Vf, muf, kf, rhof, Pr):
 
 
 # ---- Coaxial Thermal Resistance
-
 def calcul_hf_annulus(ri, ro, Vf, muf, kf, rhof, Pr):
 
     # Compute Reynold number and Nusselt number :
@@ -444,7 +440,6 @@ def calcul_Rb_coaxial(rb, kp, rpi, rpo, kgrout, Vf, muf, kf, rhof, Pr):
 
 
 # ---- U-pipe Borehole Thermal Resistance
-
 def calcul_Rb_linesource(ki, k, rb, r1, xc):
     # ki : grout thermal conductivity
     # k  : soil thermal conductivity
@@ -679,7 +674,6 @@ def combinaisons(n, k):
 
 
 # ---- 3D Borehole thermal resistance
-
 def compute_Rb3D(Rb2d, Ra, Vf, L, Cpf):
     # Ra = Borehole internal resistance in m.K/W
     # L = Borehole length in m
