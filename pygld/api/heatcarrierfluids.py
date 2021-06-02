@@ -18,7 +18,7 @@ import os.path as osp
 
 # ---- Local imports
 
-from .__init__ import __datadir__
+from pygld.api import __datadir__
 from pygld.utils.strformating import array_to_str
 
 FLUIDS = ['prop_glycol', 'ethyl_glycol', 'water']
@@ -146,7 +146,6 @@ class HeatCarrierFluid(object):
         self.__TTP = np.load(pathname)
 
     # ---- Independent properties
-
     @property
     def Tref(self):
         """Temperature of the fluid in °C.
@@ -183,7 +182,6 @@ class HeatCarrierFluid(object):
             self._fr = x
 
     # ---- Primary dependent properties
-
     @property
     def Tfp(self):
         """Freezing point temperature in °C.
@@ -283,7 +281,6 @@ class HeatCarrierFluid(object):
         return self._interp(x, z, y)
 
     # ---- Derived dependent properties
-
     @property
     def nu(self):
         """Kynematic viscosity in m²/s.
@@ -355,7 +352,6 @@ class HeatCarrierFluid(object):
         return self.cp * self.rho
 
     # ---- Calculs
-
     def _interp(self, x, z, y=None):
         """
         Interpolate a value from table for aqueous solutions and pure water
